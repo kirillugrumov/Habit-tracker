@@ -12,4 +12,4 @@ Habit-Tracker — это учебное Spring Boot приложение, пре
 5. Реализовать DTO и mapper между Entity и API-ответом.
 6. Настроить Checkstyle и привести код к стилю.
  
-[Сонар]([https://sonarcloud.io/project/overview?id=xenia777666_Electronic-Book-Catalog](https://sonarcloud.io/project/overview?id=kirillugrumov_Habit-tracker))
+[Сонар](https://sonarcloud.io/project/overview?id=kirillugrumov_Habit-tracker)
