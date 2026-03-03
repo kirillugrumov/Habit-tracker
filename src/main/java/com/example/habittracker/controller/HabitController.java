@@ -45,7 +45,7 @@ public class HabitController {
 
         List<HabitResponseDto> response = habits.stream()
                 .map(habitMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.ok(response);
     }
