@@ -15,6 +15,9 @@ public class HabitRepository {
     public HabitRepository() {
         habits.add(new Habit(1L, "Drink Water", 5));
         habits.add(new Habit(2L, "Read Book", 3));
+        habits.add(new Habit(3L, "Morning Exercise", 7));
+        habits.add(new Habit(4L, "Meditate", 10));
+        habits.add(new Habit(5L, "Learn Java", 2));
     }
 
     public List<Habit> findAll() {
