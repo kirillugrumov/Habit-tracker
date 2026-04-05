@@ -1,17 +1,17 @@
 package com.example.habittracker.dto;
 
 public class UpdateHabitRequest {
-
     private String name;
-    private Integer completionCount;
+    private String description;
     private Long categoryId;
+    private boolean removeCategory;
 
     public UpdateHabitRequest() {
     }
 
-    public UpdateHabitRequest(String name, Integer completionCount, Long categoryId) {
+    public UpdateHabitRequest(String name, String description, Long categoryId) {
         this.name = name;
-        this.completionCount = completionCount;
+        this.description = description;
         this.categoryId = categoryId;
     }
 
@@ -23,12 +23,12 @@ public class UpdateHabitRequest {
         this.name = name;
     }
 
-    public Integer getCompletionCount() {
-        return completionCount;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCompletionCount(Integer completionCount) {
-        this.completionCount = completionCount;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Long getCategoryId() {
@@ -37,5 +37,13 @@ public class UpdateHabitRequest {
 
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public boolean isRemoveCategory() {
+        return removeCategory;
+    }
+
+    public void setRemoveCategory(boolean removeCategory) {
+        this.removeCategory = removeCategory;
     }
 }

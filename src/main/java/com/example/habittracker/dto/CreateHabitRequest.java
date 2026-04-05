@@ -1,17 +1,18 @@
 package com.example.habittracker.dto;
 
 public class CreateHabitRequest {
-
     private String name;
-    private Integer completionCount; // опционально, по умолчанию 0
-    private Long categoryId; // опционально
+    private String description;
+    private Long userId;
+    private Long categoryId;
 
     public CreateHabitRequest() {
     }
 
-    public CreateHabitRequest(String name, Integer completionCount, Long categoryId) {
+    public CreateHabitRequest(String name, String description, Long userId, Long categoryId) {
         this.name = name;
-        this.completionCount = completionCount;
+        this.description = description;
+        this.userId = userId;
         this.categoryId = categoryId;
     }
 
@@ -23,12 +24,20 @@ public class CreateHabitRequest {
         this.name = name;
     }
 
-    public Integer getCompletionCount() {
-        return completionCount;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCompletionCount(Integer completionCount) {
-        this.completionCount = completionCount;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getCategoryId() {

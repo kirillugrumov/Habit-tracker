@@ -1,13 +1,15 @@
 package com.example.habittracker.dto;
 
 public class UpdateAchievementRequest {
-
     private String name;
-    private String description;
-    private Integer requiredStreak;
-    private String icon;
+    private String condition;
 
     public UpdateAchievementRequest() {
+    }
+
+    public UpdateAchievementRequest(String name, String condition) {
+        this.name = name;
+        this.condition = condition;
     }
 
     public String getName() {
@@ -18,27 +20,11 @@ public class UpdateAchievementRequest {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCondition() {
+        return condition;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getRequiredStreak() {
-        return requiredStreak;
-    }
-
-    public void setRequiredStreak(Integer requiredStreak) {
-        this.requiredStreak = requiredStreak;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 }

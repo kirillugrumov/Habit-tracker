@@ -5,22 +5,11 @@ import com.example.habittracker.dto.HabitResponseDto;
 import com.example.habittracker.dto.UpdateHabitRequest;
 import com.example.habittracker.model.Category;
 import com.example.habittracker.model.Habit;
+import com.example.habittracker.model.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public class HabitMapper {
-
-    public HabitResponseDto toDto(Habit habit) {
-        if (habit == null) {
-            return null;
-        }
-
-        return new HabitResponseDto(
-                habit.getId(),
-                habit.getName(),
-                habit.getCompletionCount()
-        );
-    }
 
     public Habit toEntity(CreateHabitRequest request, Category category) {
         if (request == null) {
@@ -29,11 +18,8 @@ public class HabitMapper {
 
         Habit habit = new Habit();
         habit.setName(request.getName());
-
-        habit.setCompletionCount(request.getCompletionCount() != null ? request.getCompletionCount() : 0);
-
+        habit.setDescription(request.getDescription());
         habit.setCategory(category);
-
         return habit;
     }
 
@@ -42,18 +28,34 @@ public class HabitMapper {
             return;
         }
 
-        if (request.getName() != null && !request.getName().isBlank()) {
+        if (request.getName() != null) {
             habit.setName(request.getName());
         }
 
-        if (request.getCompletionCount() != null) {
-            habit.setCompletionCount(request.getCompletionCount());
+        if (request.getDescription() != null) {
+            habit.setDescription(request.getDescription());
         }
 
         if (category != null) {
             habit.setCategory(category);
-        } else if (request.getCategoryId() == null) {
+        } else if (request.isRemoveCategory()) {
             habit.setCategory(null);
         }
+    }
+
+    public HabitResponseDto toResponseDto(Habit habit) {
+        if (habit == null) {
+            return null;
+        }
+
+        return new HabitResponseDto(
+                habit.getId(),
+                habit.getName(),
+                habit.getDescription(),
+                habit.getUser() != null ? habit.getUser().getId() : null,
+                habit.getUser() != null ? habit.getUser().getUsername() : null,
+                habit.getCategory() != null ? habit.getCategory().getId() : null,
+                habit.getCategory() != null ? habit.getCategory().getName() : null
+        );
     }
 }

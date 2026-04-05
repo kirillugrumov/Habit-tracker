@@ -27,11 +27,11 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<HabitLog> habitLogs = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Habit> habits = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -73,12 +73,12 @@ public class User {
         this.email = email;
     }
 
-    public List<HabitLog> getHabitLogs() {
-        return habitLogs;
+    public List<Habit> getHabits() {
+        return habits;
     }
 
-    public void setHabitLogs(List<HabitLog> habitLogs) {
-        this.habitLogs = habitLogs;
+    public void setHabits(List<Habit> habits) {
+        this.habits = habits;
     }
 
     public List<Achievement> getAchievements() {
@@ -88,5 +88,4 @@ public class User {
     public void setAchievements(List<Achievement> achievements) {
         this.achievements = achievements;
     }
-
 }

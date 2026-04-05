@@ -1,15 +1,24 @@
 package com.example.habittracker.dto;
 
 public class HabitResponseDto {
+    private final Long id;
+    private final String name;
+    private final String description;
+    private final Long userId;
+    private final String username;
+    private final Long categoryId;
+    private final String categoryName;
 
-    private Long id;
-    private String name;
-    private int completionCount;
-
-    public HabitResponseDto(Long id, String name, int completionCount) {
+    public HabitResponseDto(Long id, String name, String description,
+                            Long userId, String username,
+                            Long categoryId, String categoryName) {
         this.id = id;
         this.name = name;
-        this.completionCount = completionCount;
+        this.description = description;
+        this.userId = userId;
+        this.username = username;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
     }
 
     public Long getId() {
@@ -20,7 +29,23 @@ public class HabitResponseDto {
         return name;
     }
 
-    public int getCompletionCount() {
-        return completionCount;
+    public String getDescription() {
+        return description;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
     }
 }

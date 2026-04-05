@@ -1,6 +1,9 @@
 package com.example.habittracker.service;
 
+import com.example.habittracker.dto.CreateCategoryRequest;
 import com.example.habittracker.dto.UpdateCategoryRequest;
+import com.example.habittracker.dto.CategoryResponseDto;
+import com.example.habittracker.mapper.CategoryMapper;
 import com.example.habittracker.model.Category;
 import com.example.habittracker.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -12,59 +15,68 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     @Transactional(readOnly = true)
-    public Category getCategoryById(Long id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + id));
+    public List<CategoryResponseDto> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+
+        return categories.stream()
+                .map(categoryMapper::toResponseDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Category> getCategoriesByName(String name) {
-        if (name == null || name.isBlank()) {
-            return categoryRepository.findAll();
-        }
-        return categoryRepository.findByNameContainingIgnoreCase(name);
+    public CategoryResponseDto getCategoryById(Long id) {
+        Category category = getCategoryByIdEntity(id);
+        return categoryMapper.toResponseDto(category);
     }
 
     @Transactional
-    public Category createCategory(Category category) {
-        if (categoryRepository.existsByName(category.getName())) {
-            throw new RuntimeException("Категория с именем '" + category.getName() + "' уже существует");
+    public CategoryResponseDto createCategory(CreateCategoryRequest request) {
+        if (categoryRepository.existsByName(request.getName())) {
+            throw new RuntimeException("Категория с именем '" + request.getName() + "' уже существует");
         }
-        return categoryRepository.save(category);
+
+        Category category = categoryMapper.toEntity(request);
+        Category savedCategory = categoryRepository.save(category);
+        return categoryMapper.toResponseDto(savedCategory);
     }
 
     @Transactional
-    public Category updateCategory(Long id, UpdateCategoryRequest request) {
-        Category existingCategory = getCategoryById(id);
+    public CategoryResponseDto updateCategory(Long id, UpdateCategoryRequest request) {
+        Category category = getCategoryByIdEntity(id);
 
-        if (request.getName() != null && !request.getName().equals(existingCategory.getName())) {
+        if (request.getName() != null && !request.getName().equals(category.getName())) {
             if (categoryRepository.existsByName(request.getName())) {
-                throw new RuntimeException("Категория с именем '" + request.getName() + "' уже существует");
+                throw new RuntimeException("Имя '" + request.getName() + "' уже занято");
             }
-            existingCategory.setName(request.getName());
+            category.setName(request.getName());
         }
 
         if (request.getDescription() != null) {
-            existingCategory.setDescription(request.getDescription());
+            category.setDescription(request.getDescription());
         }
 
-        return categoryRepository.save(existingCategory);
+        Category updatedCategory = categoryRepository.save(category);
+        return categoryMapper.toResponseDto(updatedCategory);
     }
 
     @Transactional
     public void deleteCategory(Long id) {
-        Category category = getCategoryById(id);
-
-        if (!category.getHabits().isEmpty()) {
-            throw new RuntimeException("Нельзя удалить категорию, которая содержит привычки");
+        if (!categoryRepository.existsById(id)) {
+            throw new RuntimeException("Категория не найдена с id: " + id);
         }
-
         categoryRepository.deleteById(id);
+    }
+
+    private Category getCategoryByIdEntity(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + id));
     }
 }

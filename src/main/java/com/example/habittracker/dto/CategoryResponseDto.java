@@ -1,13 +1,9 @@
 package com.example.habittracker.dto;
 
 public class CategoryResponseDto {
-
-    private Long id;
-    private String name;
-    private String description;
-
-    public CategoryResponseDto() {
-    }
+    private final Long id;
+    private final String name;
+    private final String description;
 
     public CategoryResponseDto(Long id, String name, String description) {
         this.id = id;
@@ -19,23 +15,11 @@ public class CategoryResponseDto {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

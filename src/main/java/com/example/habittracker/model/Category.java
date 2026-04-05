@@ -1,6 +1,5 @@
 package com.example.habittracker.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,7 +25,8 @@ public class Category {
 
     private String description;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // Убрали cascade = CascadeType.ALL
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Habit> habits = new ArrayList<>();
 
     public Category() {

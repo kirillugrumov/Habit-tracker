@@ -26,26 +26,31 @@ public class Habit {
     @Column(nullable = false)
     private String name;
 
-    private int completionCount;
+    private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HabitLog> habitLogs = new ArrayList<>();
 
     public Habit() {
     }
 
-    public Habit(String name, int completionCount) {
+    public Habit(String name, User user) {
         this.name = name;
-        this.completionCount = completionCount;
+        this.user = user;
     }
 
-    public Habit(String name, int completionCount, Category category) {
+    public Habit(String name, String description, User user, Category category) {
         this.name = name;
-        this.completionCount = completionCount;
+        this.description = description;
+        this.user = user;
         this.category = category;
     }
 
@@ -65,12 +70,20 @@ public class Habit {
         this.name = name;
     }
 
-    public int getCompletionCount() {
-        return completionCount;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCompletionCount(int completionCount) {
-        this.completionCount = completionCount;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Category getCategory() {

@@ -1,28 +1,23 @@
 package com.example.habittracker.mapper;
 
-import com.example.habittracker.dto.AchievementResponseDto;
 import com.example.habittracker.dto.CreateAchievementRequest;
 import com.example.habittracker.dto.UpdateAchievementRequest;
+import com.example.habittracker.dto.AchievementResponseDto;
 import com.example.habittracker.model.Achievement;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AchievementMapper {
 
-    public AchievementResponseDto toDto(Achievement achievement) {
+    public AchievementResponseDto toResponseDto(Achievement achievement) {
         if (achievement == null) {
             return null;
         }
 
-        int usersCount = achievement.getUsers() != null ? achievement.getUsers().size() : 0;
-
         return new AchievementResponseDto(
                 achievement.getId(),
                 achievement.getName(),
-                achievement.getDescription(),
-                achievement.getRequiredStreak(),
-                achievement.getIcon(),
-                usersCount
+                achievement.getCondition()
         );
     }
 
@@ -33,9 +28,7 @@ public class AchievementMapper {
 
         return new Achievement(
                 request.getName(),
-                request.getDescription(),
-                request.getRequiredStreak(),
-                request.getIcon()
+                request.getCondition()
         );
     }
 
@@ -44,20 +37,12 @@ public class AchievementMapper {
             return;
         }
 
-        if (request.getName() != null && !request.getName().isBlank()) {
+        if (request.getName() != null) {
             achievement.setName(request.getName());
         }
 
-        if (request.getDescription() != null) {
-            achievement.setDescription(request.getDescription());
-        }
-
-        if (request.getRequiredStreak() != null) {
-            achievement.setRequiredStreak(request.getRequiredStreak());
-        }
-
-        if (request.getIcon() != null) {
-            achievement.setIcon(request.getIcon());
+        if (request.getCondition() != null) {
+            achievement.setCondition(request.getCondition());
         }
     }
 }

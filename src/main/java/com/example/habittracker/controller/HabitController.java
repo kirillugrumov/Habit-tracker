@@ -26,76 +26,35 @@ import java.util.List;
 public class HabitController {
 
     private final HabitService habitService;
-    private final HabitMapper habitMapper;
 
-    public HabitController(HabitService habitService,
-                           HabitMapper habitMapper) {
+    public HabitController(HabitService habitService) {
         this.habitService = habitService;
-        this.habitMapper = habitMapper;
+    }
+
+    @PostMapping
+    public ResponseEntity<HabitResponseDto> createHabit(@RequestBody CreateHabitRequest request) {
+        HabitResponseDto savedHabit = habitService.createHabit(request);
+        return new ResponseEntity<>(savedHabit, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<HabitResponseDto>> getAllHabits() {
-        List<Habit> habits = habitService.getAllHabits();
-        List<HabitResponseDto> response = habits.stream()
-                .map(habitMapper::toDto)
-                .toList();
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<HabitResponseDto>> searchHabitsByName(
-            @RequestParam String name) {
-        List<Habit> habits = habitService.getHabitsByName(name);
-        List<HabitResponseDto> response = habits.stream()
-                .map(habitMapper::toDto)
-                .toList();
-        return ResponseEntity.ok(response);
+        List<HabitResponseDto> habits = habitService.getAllHabits();
+        return ResponseEntity.ok(habits);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HabitResponseDto> getHabitById(@PathVariable Long id) {
-        return habitService.getHabitById(id)
-                .map(habitMapper::toDto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<HabitResponseDto> createHabit(
-            @RequestBody CreateHabitRequest request) {
-
-        Category category = null;
-        if (request.getCategoryId() != null) {
-            category = habitService.getCategoryById(request.getCategoryId());
-        }
-
-        Habit habit = habitMapper.toEntity(request, category);
-        Habit savedHabit = habitService.createHabit(habit);
-
-        return new ResponseEntity<>(
-                habitMapper.toDto(savedHabit),
-                HttpStatus.CREATED
-        );
+        HabitResponseDto habit = habitService.getHabitById(id);
+        return ResponseEntity.ok(habit);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<HabitResponseDto> updateHabit(
             @PathVariable Long id,
             @RequestBody UpdateHabitRequest request) {
-
-        Habit existingHabit = habitService.getHabitById(id)
-                .orElseThrow(() -> new RuntimeException("Привычка не найдена"));
-
-        Category category = null;
-        if (request.getCategoryId() != null) {
-            category = habitService.getCategoryById(request.getCategoryId());
-        }
-
-        habitMapper.updateEntity(existingHabit, request, category);
-        Habit updatedHabit = habitService.updateHabit(id, existingHabit);
-
-        return ResponseEntity.ok(habitMapper.toDto(updatedHabit));
+        HabitResponseDto updatedHabit = habitService.updateHabit(id, request);
+        return ResponseEntity.ok(updatedHabit);
     }
 
     @DeleteMapping("/{id}")
@@ -103,4 +62,7 @@ public class HabitController {
         habitService.deleteHabit(id);
         return ResponseEntity.noContent().build();
     }
+
+
+
 }

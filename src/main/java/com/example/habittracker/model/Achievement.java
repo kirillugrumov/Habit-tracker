@@ -23,13 +23,7 @@ public class Achievement {
     @Column(nullable = false, unique = true)
     private String name;
 
-    private String description;
-
-    @Column(name = "required_streak")
-    private int requiredStreak;
-
-    @Column(name = "icon")
-    private String icon;
+    private String condition;
 
     @ManyToMany(mappedBy = "achievements", fetch = FetchType.LAZY)
     private List<User> users = new ArrayList<>();
@@ -37,11 +31,9 @@ public class Achievement {
     public Achievement() {
     }
 
-    public Achievement(String name, String description, int requiredStreak, String icon) {
+    public Achievement(String name, String condition) {
         this.name = name;
-        this.description = description;
-        this.requiredStreak = requiredStreak;
-        this.icon = icon;
+        this.condition = condition;
     }
 
     public Long getId() {
@@ -60,28 +52,12 @@ public class Achievement {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCondition() {
+        return condition;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getRequiredStreak() {
-        return requiredStreak;
-    }
-
-    public void setRequiredStreak(int requiredStreak) {
-        this.requiredStreak = requiredStreak;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 
     public List<User> getUsers() {

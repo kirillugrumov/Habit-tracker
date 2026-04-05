@@ -24,26 +24,15 @@ public class HabitLog {
     @JoinColumn(name = "habit_id", nullable = false)
     private Habit habit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(name = "completion_date", nullable = false)
-    private LocalDate completionDate;
-
-    @Column(nullable = false)
-    private boolean completed;
-
-    private String notes;
+    @Column(name = "log_date", nullable = false)
+    private LocalDate logDate;
 
     public HabitLog() {
     }
 
-    public HabitLog(Habit habit, User user, LocalDate completionDate, boolean completed) {
+    public HabitLog(Habit habit, LocalDate logDate) {
         this.habit = habit;
-        this.user = user;
-        this.completionDate = completionDate;
-        this.completed = completed;
+        this.logDate = logDate;
     }
 
     public Long getId() {
@@ -62,35 +51,11 @@ public class HabitLog {
         this.habit = habit;
     }
 
-    public User getUser() {
-        return user;
+    public LocalDate getLogDate() {
+        return logDate;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public LocalDate getCompletionDate() {
-        return completionDate;
-    }
-
-    public void setCompletionDate(LocalDate completionDate) {
-        this.completionDate = completionDate;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setLogDate(LocalDate logDate) {
+        this.logDate = logDate;
     }
 }

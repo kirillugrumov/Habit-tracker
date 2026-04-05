@@ -1,5 +1,9 @@
 package com.example.habittracker.service;
 
+import com.example.habittracker.dto.CreateUserRequest;
+import com.example.habittracker.dto.UpdateUserRequest;
+import com.example.habittracker.dto.UserResponseDto;
+import com.example.habittracker.mapper.UserMapper;
 import com.example.habittracker.model.User;
 import com.example.habittracker.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -11,61 +15,64 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @Transactional
-    public User createUser(String username, String email) {
-        if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("Пользователь с таким именем уже существует");
+    public UserResponseDto createUser(CreateUserRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Пользователь с именем '" + request.getUsername() + "' уже существует");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Пользователь с email '" + request.getEmail() + "' уже существует");
         }
 
-        if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Пользователь с таким email уже существует");
-        }
-
-        User user = new User(username, email);
-        return userRepository.save(user);
+        User user = userMapper.toEntity(request);
+        User savedUser = userRepository.save(user);
+        return userMapper.toResponseDto(savedUser);
     }
 
     @Transactional(readOnly = true)
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponseDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .map(userMapper::toResponseDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public UserResponseDto getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден с id: " + id));
-    }
 
-    @Transactional(readOnly = true)
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден с username: " + username));
+          return userMapper.toResponseDto(user);
     }
 
     @Transactional
-    public User updateUser(Long id, String newUsername, String newEmail) {
-        User user = getUserById(id);
+    public UserResponseDto updateUser(Long id, UpdateUserRequest request) {
+        User user = getUserByIdEntity(id);
 
-        if (newUsername != null && !newUsername.equals(user.getUsername())) {
-            if (userRepository.findByUsername(newUsername).isPresent()) {
-                throw new RuntimeException("Имя пользователя уже занято"); // Исправлено
+        if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new RuntimeException("Имя '" + request.getUsername() + "' уже занято");
             }
-            user.setUsername(newUsername);
+            user.setUsername(request.getUsername());
         }
 
-        if (newEmail != null && !newEmail.equals(user.getEmail())) {
-            if (userRepository.findByEmail(newEmail).isPresent()) {
-                throw new RuntimeException("Email уже занят");
+        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new RuntimeException("Email '" + request.getEmail() + "' уже занят");
             }
-            user.setEmail(newEmail);
+            user.setEmail(request.getEmail());
         }
 
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        return userMapper.toResponseDto(updatedUser);
     }
 
     @Transactional
@@ -74,5 +81,10 @@ public class UserService {
             throw new RuntimeException("Пользователь не найден с id: " + id);
         }
         userRepository.deleteById(id);
+    }
+
+    private User getUserByIdEntity(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден с id: " + id));
     }
 }

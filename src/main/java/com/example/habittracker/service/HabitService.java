@@ -1,94 +1,113 @@
 package com.example.habittracker.service;
 
+import com.example.habittracker.dto.CreateHabitRequest;
+import com.example.habittracker.dto.UpdateHabitRequest;
+import com.example.habittracker.dto.HabitResponseDto;
+import com.example.habittracker.mapper.HabitMapper;
 import com.example.habittracker.model.Category;
 import com.example.habittracker.model.Habit;
+import com.example.habittracker.model.User;
 import com.example.habittracker.repository.CategoryRepository;
 import com.example.habittracker.repository.HabitRepository;
+import com.example.habittracker.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class HabitService {
 
     private final HabitRepository habitRepository;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
+    private final HabitMapper habitMapper;
 
     public HabitService(HabitRepository habitRepository,
-                        CategoryRepository categoryRepository) {
+                        CategoryRepository categoryRepository,
+                        UserRepository userRepository,
+                        HabitMapper habitMapper) {
         this.habitRepository = habitRepository;
         this.categoryRepository = categoryRepository;
-    }
-
-    @Transactional(readOnly = true)
-    public List<Habit> getAllHabits() {
-        return habitRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Habit> getHabitById(Long id) {
-        return habitRepository.findById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Habit> getHabitsByName(String name) {
-        if (name == null || name.isBlank()) {
-            return getAllHabits();
-        }
-        return habitRepository.findByNameContainingIgnoreCase(name);
+        this.userRepository = userRepository;
+        this.habitMapper = habitMapper;
     }
 
     @Transactional
-    public Habit createHabit(Habit habit) {
-        if (habitRepository.existsByName(habit.getName())) {
-            throw new RuntimeException("Привычка с именем '" + habit.getName() + "' уже существует");
+    public HabitResponseDto createHabit(CreateHabitRequest request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден с id: " + request.getUserId()));
+
+        if (habitRepository.existsByName(request.getName())) {
+            throw new RuntimeException("Привычка с именем '" + request.getName() + "' уже существует");
         }
-        return habitRepository.save(habit);
+
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + request.getCategoryId()));
+        }
+
+        Habit habit = habitMapper.toEntity(request, category);
+        habit.setUser(user);  // устанавливаем пользователя
+
+        Habit savedHabit = habitRepository.save(habit);
+
+        return habitMapper.toResponseDto(savedHabit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<HabitResponseDto> getAllHabits() {
+        List<Habit> habits = habitRepository.findAll();
+
+        return habits.stream()
+                .map(habitMapper::toResponseDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public HabitResponseDto getHabitById(Long id) {
+        Habit habit = getHabitByIdEntity(id);
+        return habitMapper.toResponseDto(habit);
     }
 
     @Transactional
-    public Habit updateHabit(Long id, Habit updatedHabit) {
-        Habit existingHabit = getHabitById(id)
-                .orElseThrow(() -> new RuntimeException("Привычка не найдена с id: " + id));
+    public HabitResponseDto updateHabit(Long id, UpdateHabitRequest request) {
+        Habit habit = getHabitByIdEntity(id);
 
-        if (updatedHabit.getName() != null &&
-                !updatedHabit.getName().equals(existingHabit.getName()) &&
-                habitRepository.existsByName(updatedHabit.getName())) {
-            throw new RuntimeException("Привычка с именем '" + updatedHabit.getName() + "' уже существует");
+        if (request.getName() != null && !request.getName().equals(habit.getName())) {
+            if (habitRepository.existsByName(request.getName())) {
+                throw new RuntimeException("Имя '" + request.getName() + "' уже занято");
+            }
+            habit.setName(request.getName());
         }
 
-        if (updatedHabit.getName() != null) {
-            existingHabit.setName(updatedHabit.getName());
+        if (request.getDescription() != null) {
+            habit.setDescription(request.getDescription());
         }
 
-        if (updatedHabit.getCompletionCount() >= 0) {
-            existingHabit.setCompletionCount(updatedHabit.getCompletionCount());
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + request.getCategoryId()));
         }
 
-        if (updatedHabit.getCategory() != null) {
-            existingHabit.setCategory(updatedHabit.getCategory());
-        }
+        habitMapper.updateEntity(habit, request, category);
 
-        return habitRepository.save(existingHabit);
+        Habit updatedHabit = habitRepository.save(habit);
+        return habitMapper.toResponseDto(updatedHabit);
     }
 
     @Transactional
     public void deleteHabit(Long id) {
-        Habit habit = getHabitById(id)
-                .orElseThrow(() -> new RuntimeException("Привычка не найдена с id: " + id));
-
-        if (!habit.getHabitLogs().isEmpty()) {
-            throw new RuntimeException("Нельзя удалить привычку, по которой есть логи выполнения");
+        if (!habitRepository.existsById(id)) {
+            throw new RuntimeException("Привычка не найдена с id: " + id);
         }
-
         habitRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
-    public Category getCategoryById(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + categoryId));
+    private Habit getHabitByIdEntity(Long id) {
+        return habitRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Привычка не найдена с id: " + id));
     }
 }

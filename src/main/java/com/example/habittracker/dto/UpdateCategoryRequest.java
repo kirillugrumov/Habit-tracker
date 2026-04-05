@@ -1,7 +1,6 @@
 package com.example.habittracker.dto;
 
 public class UpdateCategoryRequest {
-
     private String name;
     private String description;
 
