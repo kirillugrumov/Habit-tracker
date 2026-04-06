@@ -49,7 +49,7 @@ public class HabitService {
         }
 
         Habit habit = habitMapper.toEntity(request, category);
-        habit.setUser(user);  // устанавливаем пользователя
+        habit.setUser(user);
 
         Habit savedHabit = habitRepository.save(habit);
 

@@ -25,7 +25,6 @@ public class Category {
 
     private String description;
 
-    // Убрали cascade = CascadeType.ALL
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Habit> habits = new ArrayList<>();
 

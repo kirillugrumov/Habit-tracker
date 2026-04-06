@@ -36,7 +36,10 @@ public class Habit {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Goal> goals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<HabitLog> habitLogs = new ArrayList<>();
 
     public Habit() {
@@ -92,6 +95,14 @@ public class Habit {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<Goal> getGoals() {
+        return goals;
+    }
+
+    public void setGoals(List<Goal> goals) {
+        this.goals = goals;
     }
 
     public List<HabitLog> getHabitLogs() {
