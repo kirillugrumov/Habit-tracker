@@ -13,6 +13,7 @@ import com.example.habittracker.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,13 +43,17 @@ public class HabitService {
             throw new RuntimeException("Привычка с именем '" + request.getName() + "' уже существует");
         }
 
-        Category category = null;
-        if (request.getCategoryId() != null) {
-            category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + request.getCategoryId()));
+        // ✅ Изменено: categoryId → categoryIds (список)
+        List<Category> categories = new ArrayList<>();
+        if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
+            categories = categoryRepository.findAllById(request.getCategoryIds());
+            if (categories.size() != request.getCategoryIds().size()) {
+                throw new RuntimeException("Некоторые категории не найдены");
+            }
         }
 
-        Habit habit = habitMapper.toEntity(request, category);
+        // ✅ Изменено: передаём список категорий вместо одной
+        Habit habit = habitMapper.toEntity(request, categories);
         habit.setUser(user);
 
         Habit savedHabit = habitRepository.save(habit);
@@ -86,13 +91,22 @@ public class HabitService {
             habit.setDescription(request.getDescription());
         }
 
-        Category category = null;
-        if (request.getCategoryId() != null) {
-            category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + request.getCategoryId()));
+        // ✅ Изменено: categoryId → categoryIds (список)
+        List<Category> categories = null;
+        if (request.getCategoryIds() != null) {
+            if (request.getCategoryIds().isEmpty()) {
+                // Пустой список → очистить категории
+                categories = new ArrayList<>();
+            } else {
+                categories = categoryRepository.findAllById(request.getCategoryIds());
+                if (categories.size() != request.getCategoryIds().size()) {
+                    throw new RuntimeException("Некоторые категории не найдены");
+                }
+            }
         }
 
-        habitMapper.updateEntity(habit, request, category);
+        // ✅ Изменено: передаём список категорий
+        habitMapper.updateEntity(habit, request, categories);
 
         Habit updatedHabit = habitRepository.save(habit);
         return habitMapper.toResponseDto(updatedHabit);

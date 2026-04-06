@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -23,18 +25,24 @@ public class Habit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(length = 500)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    // ✅ ТОЛЬКО ManyToMany, удалить старое поле category
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "habit_categories",
+            joinColumns = @JoinColumn(name = "habit_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "habit", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Goal> goals = new ArrayList<>();
@@ -50,13 +58,14 @@ public class Habit {
         this.user = user;
     }
 
-    public Habit(String name, String description, User user, Category category) {
+    // ✅ Исправить конструктор - убрать Category category
+    public Habit(String name, String description, User user) {
         this.name = name;
         this.description = description;
         this.user = user;
-        this.category = category;
     }
 
+    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
@@ -89,12 +98,13 @@ public class Habit {
         this.user = user;
     }
 
-    public Category getCategory() {
-        return category;
+    // ✅ Вместо getCategory/setCategory - работаем со списком категорий
+    public List<Category> getCategories() {
+        return categories;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
     }
 
     public List<Goal> getGoals() {
@@ -111,5 +121,16 @@ public class Habit {
 
     public void setHabitLogs(List<HabitLog> habitLogs) {
         this.habitLogs = habitLogs;
+    }
+
+    // ✅ Вспомогательные методы для работы с категориями
+    public void addCategory(Category category) {
+        categories.add(category);
+        category.getHabits().add(this);
+    }
+
+    public void removeCategory(Category category) {
+        categories.remove(category);
+        category.getHabits().remove(this);
     }
 }

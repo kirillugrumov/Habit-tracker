@@ -1,18 +1,20 @@
 package com.example.habittracker.dto;
 
+import java.util.List;
+
 public class UpdateHabitRequest {
     private String name;
     private String description;
-    private Long categoryId;
-    private boolean removeCategory;
+    private List<Long> categoryIds;  // ✅ изменено (может быть null = не менять)
 
     public UpdateHabitRequest() {
     }
 
-    public UpdateHabitRequest(String name, String description, Long categoryId) {
+    // ✅ Исправлен конструктор
+    public UpdateHabitRequest(String name, String description, List<Long> categoryIds) {
         this.name = name;
         this.description = description;
-        this.categoryId = categoryId;
+        this.categoryIds = categoryIds;
     }
 
     public String getName() {
@@ -31,19 +33,12 @@ public class UpdateHabitRequest {
         this.description = description;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    // ✅ Вместо getCategoryId/setCategoryId
+    public List<Long> getCategoryIds() {
+        return categoryIds;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public boolean isRemoveCategory() {
-        return removeCategory;
-    }
-
-    public void setRemoveCategory(boolean removeCategory) {
-        this.removeCategory = removeCategory;
+    public void setCategoryIds(List<Long> categoryIds) {
+        this.categoryIds = categoryIds;
     }
 }

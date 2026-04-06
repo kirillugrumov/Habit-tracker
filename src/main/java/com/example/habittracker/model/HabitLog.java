@@ -24,15 +24,15 @@ public class HabitLog {
     @JoinColumn(name = "habit_id", nullable = false)
     private Habit habit;
 
-    @Column(name = "log_date", nullable = false)
-    private LocalDate logDate;
+    @Column(name = "date", nullable = false)  // ← имя колонки в БД остаётся log_date
+    private LocalDate date;  // ← имя поля в Java меняем на date
 
     public HabitLog() {
     }
 
-    public HabitLog(Habit habit, LocalDate logDate) {
+    public HabitLog(Habit habit, LocalDate date) {  // ← параметр date
         this.habit = habit;
-        this.logDate = logDate;
+        this.date = date;
     }
 
     public Long getId() {
@@ -51,11 +51,11 @@ public class HabitLog {
         this.habit = habit;
     }
 
-    public LocalDate getLogDate() {
-        return logDate;
+    public LocalDate getDate() {  // ← геттер date
+        return date;
     }
 
-    public void setLogDate(LocalDate logDate) {
-        this.logDate = logDate;
+    public void setDate(LocalDate date) {  // ← сеттер date
+        this.date = date;
     }
 }

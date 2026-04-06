@@ -1,19 +1,23 @@
 package com.example.habittracker.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CreateHabitRequest {
     private String name;
     private String description;
     private Long userId;
-    private Long categoryId;
+    private List<Long> categoryIds = new ArrayList<>();  // ✅ изменено
 
     public CreateHabitRequest() {
     }
 
-    public CreateHabitRequest(String name, String description, Long userId, Long categoryId) {
+    // ✅ Исправлен конструктор
+    public CreateHabitRequest(String name, String description, Long userId, List<Long> categoryIds) {
         this.name = name;
         this.description = description;
         this.userId = userId;
-        this.categoryId = categoryId;
+        this.categoryIds = categoryIds != null ? categoryIds : new ArrayList<>();
     }
 
     public String getName() {
@@ -40,11 +44,12 @@ public class CreateHabitRequest {
         this.userId = userId;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    // ✅ Вместо getCategoryId/setCategoryId
+    public List<Long> getCategoryIds() {
+        return categoryIds;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryIds(List<Long> categoryIds) {
+        this.categoryIds = categoryIds != null ? categoryIds : new ArrayList<>();
     }
 }

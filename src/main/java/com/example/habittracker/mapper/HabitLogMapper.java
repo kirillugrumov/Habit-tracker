@@ -17,7 +17,7 @@ public class HabitLogMapper {
         return new HabitLogResponseDto(
                 habitLog.getId(),
                 habitLog.getHabit() != null ? habitLog.getHabit().getId() : null,
-                habitLog.getLogDate()
+                habitLog.getDate()
         );
     }
 
