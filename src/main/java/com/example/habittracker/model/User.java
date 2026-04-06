@@ -33,14 +33,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Habit> habits = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_achievements",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "achievement_id")
-    )
-    private List<Achievement> achievements = new ArrayList<>();
-
     public User() {
     }
 
@@ -79,13 +71,5 @@ public class User {
 
     public void setHabits(List<Habit> habits) {
         this.habits = habits;
-    }
-
-    public List<Achievement> getAchievements() {
-        return achievements;
-    }
-
-    public void setAchievements(List<Achievement> achievements) {
-        this.achievements = achievements;
     }
 }
