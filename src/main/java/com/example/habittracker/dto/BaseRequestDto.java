@@ -2,11 +2,11 @@ package com.example.habittracker.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class CategoryResponseDto {
-    private Long id;
+public abstract class BaseRequestDto {
     private String name;
-    private String description;
 }

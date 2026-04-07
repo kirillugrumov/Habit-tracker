@@ -1,67 +1,23 @@
 package com.example.habittracker.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import java.util.List;
 
+@Data
+@AllArgsConstructor
 public class HabitResponseDto {
-    private final Long id;
-    private final String name;
-    private final String description;
-    private final Long userId;
-    private final String username;
-    private final List<CategoryInfo> categories;  // ✅ изменено
+    private Long id;
+    private String name;
+    private String description;
+    private Long userId;
+    private String username;
+    private List<CategoryInfo> categories;
 
-    // ✅ Внутренний DTO для категории
+    @Data
+    @AllArgsConstructor
     public static class CategoryInfo {
-        private final Long id;
-        private final String name;
-
-        public CategoryInfo(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
-    // ✅ Исправлен конструктор
-    public HabitResponseDto(Long id, String name, String description,
-                            Long userId, String username,
-                            List<CategoryInfo> categories) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.userId = userId;
-        this.username = username;
-        this.categories = categories != null ? categories : List.of();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public List<CategoryInfo> getCategories() {
-        return categories;
+        private Long id;
+        private String name;
     }
 }
