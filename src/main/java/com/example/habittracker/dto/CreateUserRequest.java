@@ -6,6 +6,7 @@ public class CreateUserRequest {
     private String email;
 
     public CreateUserRequest() {
+        // Пустой конструктор для Jackson (десериализация JSON)
     }
 
     public CreateUserRequest(String username, String email) {

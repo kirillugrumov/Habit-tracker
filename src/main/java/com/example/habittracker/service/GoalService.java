@@ -8,6 +8,8 @@ import com.example.habittracker.model.Goal;
 import com.example.habittracker.model.Habit;
 import com.example.habittracker.repository.GoalRepository;
 import com.example.habittracker.repository.HabitRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +33,7 @@ public class GoalService {
     @Transactional
     public GoalResponseDto createGoal(CreateGoalRequest request) {
         if (goalRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Цель с именем '" + request.getName() + "' уже существует");
+            throw new EntityExistsException("Цель с именем '" + request.getName() + "' уже существует");
         }
 
         Habit habit = habitRepository.findById(request.getHabitId())
@@ -63,7 +65,7 @@ public class GoalService {
 
         if (request.getName() != null && !request.getName().equals(goal.getName())) {
             if (goalRepository.existsByName(request.getName())) {
-                throw new RuntimeException("Имя '" + request.getName() + "' уже занято");
+                throw new EntityExistsException("Имя '" + request.getName() + "' уже занято");
             }
             goal.setName(request.getName());
         }
@@ -85,7 +87,7 @@ public class GoalService {
     @Transactional
     public void deleteGoal(Long id) {
         if (!goalRepository.existsById(id)) {
-            throw new RuntimeException("Цель не найдена с id: " + id);
+            throw new EntityNotFoundException("Цель не найдена с id: " + id);
         }
         goalRepository.deleteById(id);
     }

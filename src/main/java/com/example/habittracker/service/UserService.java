@@ -6,6 +6,8 @@ import com.example.habittracker.dto.UserResponseDto;
 import com.example.habittracker.mapper.UserMapper;
 import com.example.habittracker.model.User;
 import com.example.habittracker.repository.UserRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +27,10 @@ public class UserService {
     @Transactional
     public UserResponseDto createUser(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Пользователь с именем '" + request.getUsername() + "' уже существует");
+            throw new EntityExistsException("Пользователь с именем '" + request.getUsername() + "' уже существует");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Пользователь с email '" + request.getEmail() + "' уже существует");
+            throw new EntityExistsException("Пользователь с email '" + request.getEmail() + "' уже существует");
         }
 
         User user = userMapper.toEntity(request);
@@ -59,14 +61,14 @@ public class UserService {
 
         if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
             if (userRepository.existsByUsername(request.getUsername())) {
-                throw new RuntimeException("Имя '" + request.getUsername() + "' уже занято");
+                throw new EntityExistsException("Имя '" + request.getUsername() + "' уже занято");
             }
             user.setUsername(request.getUsername());
         }
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
-                throw new RuntimeException("Email '" + request.getEmail() + "' уже занят");
+                throw new EntityExistsException("Email '" + request.getEmail() + "' уже занят");
             }
             user.setEmail(request.getEmail());
         }
@@ -78,7 +80,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Пользователь не найден с id: " + id);
+            throw new EntityNotFoundException("Пользователь не найден с id: " + id);
         }
         userRepository.deleteById(id);
     }

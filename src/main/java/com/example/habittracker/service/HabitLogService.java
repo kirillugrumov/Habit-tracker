@@ -7,6 +7,7 @@ import com.example.habittracker.model.Habit;
 import com.example.habittracker.model.HabitLog;
 import com.example.habittracker.repository.HabitLogRepository;
 import com.example.habittracker.repository.HabitRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +60,7 @@ public class HabitLogService {
     @Transactional
     public void deleteHabitLog(Long id) {
         if (!habitLogRepository.existsById(id)) {
-            throw new RuntimeException("Лог не найден с id: " + id);
+            throw new EntityNotFoundException("Лог не найден с id: " + id);
         }
         habitLogRepository.deleteById(id);
     }

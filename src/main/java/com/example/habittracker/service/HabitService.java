@@ -12,6 +12,8 @@ import com.example.habittracker.model.User;
 import com.example.habittracker.repository.CategoryRepository;
 import com.example.habittracker.repository.HabitRepository;
 import com.example.habittracker.repository.UserRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,17 +44,17 @@ public class HabitService {
     @Transactional
     public HabitResponseDto createHabit(CreateHabitRequest request) {
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден с id: " + request.getUserId()));
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден с id: " + request.getUserId()));
 
         if (habitRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Привычка с именем '" + request.getName() + "' уже существует");
+            throw new EntityExistsException("Привычка с именем '" + request.getName() + "' уже существует");
         }
 
         List<Category> categories = new ArrayList<>();
         if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             categories = categoryRepository.findAllById(request.getCategoryIds());
             if (categories.size() != request.getCategoryIds().size()) {
-                throw new RuntimeException("Некоторые категории не найдены");
+                throw new EntityNotFoundException("Некоторые категории не найдены");
             }
         }
 
@@ -84,7 +86,7 @@ public class HabitService {
 
         if (request.getName() != null && !request.getName().equals(habit.getName())) {
             if (habitRepository.existsByName(request.getName())) {
-                throw new RuntimeException("Имя '" + request.getName() + "' уже занято");
+                throw new EntityExistsException("Имя '" + request.getName() + "' уже занято");
             }
             habit.setName(request.getName());
         }
@@ -100,7 +102,7 @@ public class HabitService {
             } else {
                 categories = categoryRepository.findAllById(request.getCategoryIds());
                 if (categories.size() != request.getCategoryIds().size()) {
-                    throw new RuntimeException("Некоторые категории не найдены");
+                    throw new EntityNotFoundException("Некоторые категории не найдены");
                 }
             }
         }
@@ -114,13 +116,14 @@ public class HabitService {
     @Transactional
     public void deleteHabit(Long id) {
         if (!habitRepository.existsById(id)) {
-            throw new RuntimeException("Привычка не найдена с id: " + id);
+            throw new EntityNotFoundException("Привычка не найдена с id: " + id);
         }
         habitRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)
     public List<HabitResponseDto> getHabitsWithProblem() {
+        // NOSONAR - метод для демонстрации проблемы N+1
         List<Habit> habits = habitRepository.findAll();
         return habits.stream()
                 .map(habitMapper::toResponseDto)
