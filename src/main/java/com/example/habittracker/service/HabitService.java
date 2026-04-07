@@ -121,7 +121,6 @@ public class HabitService {
 
     @Transactional(readOnly = true)
     public List<HabitResponseDto> getHabitsWithProblem() {
-        System.out.println("\nМЕТОД С ПРОБЛЕМОЙ N+1");
         List<Habit> habits = habitRepository.findAll();
         return habits.stream()
                 .map(habitMapper::toResponseDto)
@@ -130,21 +129,14 @@ public class HabitService {
 
     @Transactional(readOnly = true)
     public List<HabitResponseDto> getHabitsOptimized() {
-        System.out.println("\nМЕТОД С JOIN FETCH (РЕШЕНИЕ)");
         List<Habit> habits = habitRepository.findAllOptimized();
         return habits.stream()
                 .map(habitMapper::toResponseDto)
                 .toList();
     }
 
-    // ========== ДЕМО-МЕТОДЫ ДЛЯ ТРАНЗАКЦИЙ ==========
-
-    // БЕЗ @Transactional - частичное сохранение
     public UserWithHabitResponseDto saveUserAndHabitWithoutTransaction(
-            String username,
-            String email,
-            String habitName,
-            String habitDescription) {
+            String username, String email, String habitName, String habitDescription) {
         User user = new User(username, email);
         User savedUser = userRepository.save(user);
 
@@ -155,21 +147,10 @@ public class HabitService {
         return userWithHabitMapper.toResponseDto(savedUser, savedHabit);
     }
 
-    // С @Transactional - полный откат
     @Transactional
     public UserWithHabitResponseDto saveUserAndHabitWithTransaction(
-            String username,
-            String email,
-            String habitName,
-            String habitDescription) {
-        User user = new User(username, email);
-        User savedUser = userRepository.save(user);
-
-        Habit habit = new Habit(habitName, savedUser);
-        habit.setDescription(habitDescription);
-        Habit savedHabit = habitRepository.save(habit);
-
-        return userWithHabitMapper.toResponseDto(savedUser, savedHabit);
+            String username, String email, String habitName, String habitDescription) {
+        return saveUserAndHabitWithoutTransaction(username, email, habitName, habitDescription);
     }
 
     private Habit getHabitByIdEntity(Long id) {

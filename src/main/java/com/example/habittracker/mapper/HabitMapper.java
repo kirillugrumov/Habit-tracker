@@ -54,7 +54,7 @@ public class HabitMapper {
                         category.getId(),
                         category.getName()
                 ))
-                .collect(Collectors.toList());
+                .toList();
 
         return new HabitResponseDto(
                 habit.getId(),

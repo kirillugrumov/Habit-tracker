@@ -63,17 +63,13 @@ public class HabitController {
 
     @GetMapping("/demo/problem")
     public ResponseEntity<List<HabitResponseDto>> demoProblem() {
-        System.out.println("\n========== ДЕМОНСТРАЦИЯ ПРОБЛЕМЫ N+1 ==========");
         List<HabitResponseDto> habits = habitService.getHabitsWithProblem();
-        System.out.println("================================================\n");
         return ResponseEntity.ok(habits);
     }
 
     @GetMapping("/demo/solution")
     public ResponseEntity<List<HabitResponseDto>> demoSolution() {
-        System.out.println("\n========== РЕШЕНИЕ N+1 через JOIN FETCH ==========");
         List<HabitResponseDto> habits = habitService.getHabitsOptimized();
-        System.out.println("==================================================\n");
         return ResponseEntity.ok(habits);
     }
 

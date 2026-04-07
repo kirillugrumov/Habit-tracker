@@ -5,12 +5,12 @@ import java.time.LocalDate;
 public class HabitLogResponseDto {
     private final Long id;
     private final Long habitId;
-    private final LocalDate Date;
+    private final LocalDate date;
 
     public HabitLogResponseDto(Long id, Long habitId, LocalDate date) {
         this.id = id;
         this.habitId = habitId;
-        this.Date = date;
+        this.date = date;
     }
 
     public Long getId() {
@@ -22,6 +22,6 @@ public class HabitLogResponseDto {
     }
 
     public LocalDate getLogDate() {
-        return Date;
+        return date;
     }
 }

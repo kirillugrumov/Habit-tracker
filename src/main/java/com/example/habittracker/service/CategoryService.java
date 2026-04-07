@@ -8,6 +8,8 @@ import com.example.habittracker.model.Category;
 import com.example.habittracker.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 
@@ -40,7 +42,9 @@ public class CategoryService {
     @Transactional
     public CategoryResponseDto createCategory(CreateCategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Категория с именем '" + request.getName() + "' уже существует");
+            throw new EntityExistsException(
+                    "Категория с именем '" + request.getName() + "' уже существует"
+            );
         }
 
         Category category = categoryMapper.toEntity(request);
@@ -54,7 +58,7 @@ public class CategoryService {
 
         if (request.getName() != null && !request.getName().equals(category.getName())) {
             if (categoryRepository.existsByName(request.getName())) {
-                throw new RuntimeException("Имя '" + request.getName() + "' уже занято");
+                throw new EntityExistsException("Имя '" + request.getName() + "' уже занято");
             }
             category.setName(request.getName());
         }
@@ -70,9 +74,8 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         if (!categoryRepository.existsById(id)) {
-            throw new RuntimeException("Категория не найдена с id: " + id);
+            throw new EntityNotFoundException("Категория не найдена с id: " + id);
         }
-
         categoryRepository.deleteById(id);
     }
 
