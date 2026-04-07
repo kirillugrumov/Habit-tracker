@@ -5,12 +5,11 @@ import java.util.List;
 public class UpdateHabitRequest {
     private String name;
     private String description;
-    private List<Long> categoryIds;  // ✅ изменено (может быть null = не менять)
+    private List<Long> categoryIds;
 
     public UpdateHabitRequest() {
     }
 
-    // ✅ Исправлен конструктор
     public UpdateHabitRequest(String name, String description, List<Long> categoryIds) {
         this.name = name;
         this.description = description;
@@ -33,7 +32,6 @@ public class UpdateHabitRequest {
         this.description = description;
     }
 
-    // ✅ Вместо getCategoryId/setCategoryId
     public List<Long> getCategoryIds() {
         return categoryIds;
     }

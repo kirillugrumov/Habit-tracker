@@ -5,9 +5,6 @@ import com.example.habittracker.dto.HabitResponseDto;
 import com.example.habittracker.dto.UpdateHabitRequest;
 import com.example.habittracker.dto.UserWithHabitResponseDto;
 import com.example.habittracker.dto.CreateUserWithHabitRequest;
-import com.example.habittracker.mapper.HabitMapper;
-import com.example.habittracker.model.Category;
-import com.example.habittracker.model.Habit;
 import com.example.habittracker.service.HabitService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -82,7 +78,8 @@ public class HabitController {
     }
 
     @PostMapping("/demo/save-without-tx")
-    public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithoutTransaction(@RequestBody CreateUserWithHabitRequest request) {
+    public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithoutTransaction(
+            @RequestBody CreateUserWithHabitRequest request) {
         UserWithHabitResponseDto response = habitService.saveUserAndHabitWithoutTransaction(
                 request.getUsername(),
                 request.getEmail(),
@@ -93,7 +90,8 @@ public class HabitController {
     }
 
     @PostMapping("/demo/save-with-tx")
-    public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithTransaction(@RequestBody CreateUserWithHabitRequest request) {
+    public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithTransaction(
+            @RequestBody CreateUserWithHabitRequest request) {
         UserWithHabitResponseDto response = habitService.saveUserAndHabitWithTransaction(
                 request.getUsername(),
                 request.getEmail(),

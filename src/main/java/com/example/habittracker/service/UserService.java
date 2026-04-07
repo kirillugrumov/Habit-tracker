@@ -50,7 +50,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден с id: " + id));
 
-          return userMapper.toResponseDto(user);
+        return userMapper.toResponseDto(user);
     }
 
     @Transactional

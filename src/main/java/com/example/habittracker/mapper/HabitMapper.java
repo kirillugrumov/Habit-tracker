@@ -14,9 +14,6 @@ import java.util.stream.Collectors;
 @Component
 public class HabitMapper {
 
-    // ============================================================
-    // CreateHabitRequest → Habit (Entity)
-    // ============================================================
     public Habit toEntity(CreateHabitRequest request, List<Category> categories) {
         if (request == null) {
             return null;
@@ -29,9 +26,6 @@ public class HabitMapper {
         return habit;
     }
 
-    // ============================================================
-    // UpdateHabitRequest → существующий Habit
-    // ============================================================
     public void updateEntity(Habit habit, UpdateHabitRequest request, List<Category> categories) {
         if (request == null || habit == null) {
             return;
@@ -45,24 +39,16 @@ public class HabitMapper {
             habit.setDescription(request.getDescription());
         }
 
-        // Обработка категорий:
-        // - categories = null → не меняем
-        // - categories = пустой список → очищаем
-        // - categories = список с ID → устанавливаем новые категории
         if (categories != null) {
             habit.setCategories(categories);
         }
     }
 
-    // ============================================================
-    // Habit (Entity) → HabitResponseDto
-    // ============================================================
     public HabitResponseDto toResponseDto(Habit habit) {
         if (habit == null) {
             return null;
         }
 
-        // Преобразуем список категорий в список CategoryInfo
         List<HabitResponseDto.CategoryInfo> categoryInfos = habit.getCategories().stream()
                 .map(category -> new HabitResponseDto.CategoryInfo(
                         category.getId(),

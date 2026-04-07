@@ -73,8 +73,6 @@ public class CategoryService {
             throw new RuntimeException("Категория не найдена с id: " + id);
         }
 
-        // ⚠️ ВНИМАНИЕ: При удалении категории, связь с привычками теряется,
-        // но привычки НЕ удаляются (это правильно для ManyToMany)
         categoryRepository.deleteById(id);
     }
 

@@ -7,12 +7,11 @@ public class CreateHabitRequest {
     private String name;
     private String description;
     private Long userId;
-    private List<Long> categoryIds = new ArrayList<>();  // ✅ изменено
+    private List<Long> categoryIds = new ArrayList<>();
 
     public CreateHabitRequest() {
     }
 
-    // ✅ Исправлен конструктор
     public CreateHabitRequest(String name, String description, Long userId, List<Long> categoryIds) {
         this.name = name;
         this.description = description;
@@ -44,7 +43,6 @@ public class CreateHabitRequest {
         this.userId = userId;
     }
 
-    // ✅ Вместо getCategoryId/setCategoryId
     public List<Long> getCategoryIds() {
         return categoryIds;
     }

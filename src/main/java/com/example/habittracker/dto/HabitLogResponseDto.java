@@ -7,10 +7,10 @@ public class HabitLogResponseDto {
     private final Long habitId;
     private final LocalDate Date;
 
-    public HabitLogResponseDto(Long id, Long habitId, LocalDate Date) {
+    public HabitLogResponseDto(Long id, Long habitId, LocalDate date) {
         this.id = id;
         this.habitId = habitId;
-        this.Date = Date;
+        this.Date = date;
     }
 
     public Long getId() {

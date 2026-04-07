@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    // Проверка существования категории по имени (для createCategory и updateCategory)
     boolean existsByName(String name);
 }

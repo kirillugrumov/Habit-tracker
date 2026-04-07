@@ -35,7 +35,6 @@ public class Habit {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // ✅ ТОЛЬКО ManyToMany, удалить старое поле category
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "habit_categories",
@@ -58,14 +57,12 @@ public class Habit {
         this.user = user;
     }
 
-    // ✅ Исправить конструктор - убрать Category category
     public Habit(String name, String description, User user) {
         this.name = name;
         this.description = description;
         this.user = user;
     }
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
@@ -98,7 +95,6 @@ public class Habit {
         this.user = user;
     }
 
-    // ✅ Вместо getCategory/setCategory - работаем со списком категорий
     public List<Category> getCategories() {
         return categories;
     }
@@ -123,7 +119,6 @@ public class Habit {
         this.habitLogs = habitLogs;
     }
 
-    // ✅ Вспомогательные методы для работы с категориями
     public void addCategory(Category category) {
         categories.add(category);
         category.getHabits().add(this);

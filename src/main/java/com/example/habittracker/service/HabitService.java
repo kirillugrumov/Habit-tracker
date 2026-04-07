@@ -140,7 +140,11 @@ public class HabitService {
     // ========== ДЕМО-МЕТОДЫ ДЛЯ ТРАНЗАКЦИЙ ==========
 
     // БЕЗ @Transactional - частичное сохранение
-    public UserWithHabitResponseDto saveUserAndHabitWithoutTransaction(String username, String email, String habitName, String habitDescription) {
+    public UserWithHabitResponseDto saveUserAndHabitWithoutTransaction(
+            String username,
+            String email,
+            String habitName,
+            String habitDescription) {
         User user = new User(username, email);
         User savedUser = userRepository.save(user);
 
@@ -153,7 +157,11 @@ public class HabitService {
 
     // С @Transactional - полный откат
     @Transactional
-    public UserWithHabitResponseDto saveUserAndHabitWithTransaction(String username, String email, String habitName, String habitDescription) {
+    public UserWithHabitResponseDto saveUserAndHabitWithTransaction(
+            String username,
+            String email,
+            String habitName,
+            String habitDescription) {
         User user = new User(username, email);
         User savedUser = userRepository.save(user);
 
@@ -163,8 +171,6 @@ public class HabitService {
 
         return userWithHabitMapper.toResponseDto(savedUser, savedHabit);
     }
-
-    // ========== ПРИВАТНЫЙ МЕТОД ==========
 
     private Habit getHabitByIdEntity(Long id) {
         return habitRepository.findById(id)

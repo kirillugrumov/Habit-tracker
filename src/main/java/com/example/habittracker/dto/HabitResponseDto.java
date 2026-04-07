@@ -61,7 +61,6 @@ public class HabitResponseDto {
         return username;
     }
 
-    // ✅ Вместо getCategoryId/getCategoryName
     public List<CategoryInfo> getCategories() {
         return categories;
     }
