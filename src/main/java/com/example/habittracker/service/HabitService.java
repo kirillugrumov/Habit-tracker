@@ -121,9 +121,9 @@ public class HabitService {
         habitRepository.deleteById(id);
     }
 
+    @SuppressWarnings("java:S4144")
     @Transactional(readOnly = true)
     public List<HabitResponseDto> getHabitsWithProblem() {
-        // NOSONAR - метод для демонстрации проблемы N+1
         List<Habit> habits = habitRepository.findAll();
         return habits.stream()
                 .map(habitMapper::toResponseDto)

@@ -7,6 +7,7 @@ public class CreateUserWithHabitRequest {
     private String habitDescription;
 
     public CreateUserWithHabitRequest() {
+        // Пустой конструктор для Jackson (десериализация JSON)
     }
 
     public String getUsername() {
