@@ -3,6 +3,8 @@ package com.example.habittracker.controller;
 import com.example.habittracker.dto.CreateHabitRequest;
 import com.example.habittracker.dto.HabitResponseDto;
 import com.example.habittracker.dto.UpdateHabitRequest;
+import com.example.habittracker.dto.UserWithHabitResponseDto;
+import com.example.habittracker.dto.CreateUserWithHabitRequest;
 import com.example.habittracker.mapper.HabitMapper;
 import com.example.habittracker.model.Category;
 import com.example.habittracker.model.Habit;
@@ -61,6 +63,44 @@ public class HabitController {
     public ResponseEntity<Void> deleteHabit(@PathVariable Long id) {
         habitService.deleteHabit(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/demo/problem")
+    public ResponseEntity<List<HabitResponseDto>> demoProblem() {
+        System.out.println("\n========== ДЕМОНСТРАЦИЯ ПРОБЛЕМЫ N+1 ==========");
+        List<HabitResponseDto> habits = habitService.getHabitsWithProblem();
+        System.out.println("================================================\n");
+        return ResponseEntity.ok(habits);
+    }
+
+    @GetMapping("/demo/solution")
+    public ResponseEntity<List<HabitResponseDto>> demoSolution() {
+        System.out.println("\n========== РЕШЕНИЕ N+1 через JOIN FETCH ==========");
+        List<HabitResponseDto> habits = habitService.getHabitsOptimized();
+        System.out.println("==================================================\n");
+        return ResponseEntity.ok(habits);
+    }
+
+    @PostMapping("/demo/save-without-tx")
+    public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithoutTransaction(@RequestBody CreateUserWithHabitRequest request) {
+        UserWithHabitResponseDto response = habitService.saveUserAndHabitWithoutTransaction(
+                request.getUsername(),
+                request.getEmail(),
+                request.getHabitName(),
+                request.getHabitDescription()
+        );
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/demo/save-with-tx")
+    public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithTransaction(@RequestBody CreateUserWithHabitRequest request) {
+        UserWithHabitResponseDto response = habitService.saveUserAndHabitWithTransaction(
+                request.getUsername(),
+                request.getEmail(),
+                request.getHabitName(),
+                request.getHabitDescription()
+        );
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 

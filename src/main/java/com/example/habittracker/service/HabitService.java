@@ -3,7 +3,9 @@ package com.example.habittracker.service;
 import com.example.habittracker.dto.CreateHabitRequest;
 import com.example.habittracker.dto.UpdateHabitRequest;
 import com.example.habittracker.dto.HabitResponseDto;
+import com.example.habittracker.dto.UserWithHabitResponseDto;
 import com.example.habittracker.mapper.HabitMapper;
+import com.example.habittracker.mapper.UserWithHabitMapper;
 import com.example.habittracker.model.Category;
 import com.example.habittracker.model.Habit;
 import com.example.habittracker.model.User;
@@ -23,15 +25,18 @@ public class HabitService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final HabitMapper habitMapper;
+    private final UserWithHabitMapper userWithHabitMapper;
 
     public HabitService(HabitRepository habitRepository,
                         CategoryRepository categoryRepository,
                         UserRepository userRepository,
-                        HabitMapper habitMapper) {
+                        HabitMapper habitMapper,
+                        UserWithHabitMapper userWithHabitMapper) {
         this.habitRepository = habitRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.habitMapper = habitMapper;
+        this.userWithHabitMapper = userWithHabitMapper;
     }
 
     @Transactional
@@ -43,7 +48,6 @@ public class HabitService {
             throw new RuntimeException("Привычка с именем '" + request.getName() + "' уже существует");
         }
 
-        // ✅ Изменено: categoryId → categoryIds (список)
         List<Category> categories = new ArrayList<>();
         if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             categories = categoryRepository.findAllById(request.getCategoryIds());
@@ -52,7 +56,6 @@ public class HabitService {
             }
         }
 
-        // ✅ Изменено: передаём список категорий вместо одной
         Habit habit = habitMapper.toEntity(request, categories);
         habit.setUser(user);
 
@@ -64,7 +67,6 @@ public class HabitService {
     @Transactional(readOnly = true)
     public List<HabitResponseDto> getAllHabits() {
         List<Habit> habits = habitRepository.findAll();
-
         return habits.stream()
                 .map(habitMapper::toResponseDto)
                 .toList();
@@ -91,11 +93,9 @@ public class HabitService {
             habit.setDescription(request.getDescription());
         }
 
-        // ✅ Изменено: categoryId → categoryIds (список)
         List<Category> categories = null;
         if (request.getCategoryIds() != null) {
             if (request.getCategoryIds().isEmpty()) {
-                // Пустой список → очистить категории
                 categories = new ArrayList<>();
             } else {
                 categories = categoryRepository.findAllById(request.getCategoryIds());
@@ -105,7 +105,6 @@ public class HabitService {
             }
         }
 
-        // ✅ Изменено: передаём список категорий
         habitMapper.updateEntity(habit, request, categories);
 
         Habit updatedHabit = habitRepository.save(habit);
@@ -119,6 +118,53 @@ public class HabitService {
         }
         habitRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<HabitResponseDto> getHabitsWithProblem() {
+        System.out.println("\nМЕТОД С ПРОБЛЕМОЙ N+1");
+        List<Habit> habits = habitRepository.findAll();
+        return habits.stream()
+                .map(habitMapper::toResponseDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<HabitResponseDto> getHabitsOptimized() {
+        System.out.println("\nМЕТОД С JOIN FETCH (РЕШЕНИЕ)");
+        List<Habit> habits = habitRepository.findAllOptimized();
+        return habits.stream()
+                .map(habitMapper::toResponseDto)
+                .toList();
+    }
+
+    // ========== ДЕМО-МЕТОДЫ ДЛЯ ТРАНЗАКЦИЙ ==========
+
+    // БЕЗ @Transactional - частичное сохранение
+    public UserWithHabitResponseDto saveUserAndHabitWithoutTransaction(String username, String email, String habitName, String habitDescription) {
+        User user = new User(username, email);
+        User savedUser = userRepository.save(user);
+
+        Habit habit = new Habit(habitName, savedUser);
+        habit.setDescription(habitDescription);
+        Habit savedHabit = habitRepository.save(habit);
+
+        return userWithHabitMapper.toResponseDto(savedUser, savedHabit);
+    }
+
+    // С @Transactional - полный откат
+    @Transactional
+    public UserWithHabitResponseDto saveUserAndHabitWithTransaction(String username, String email, String habitName, String habitDescription) {
+        User user = new User(username, email);
+        User savedUser = userRepository.save(user);
+
+        Habit habit = new Habit(habitName, savedUser);
+        habit.setDescription(habitDescription);
+        Habit savedHabit = habitRepository.save(habit);
+
+        return userWithHabitMapper.toResponseDto(savedUser, savedHabit);
+    }
+
+    // ========== ПРИВАТНЫЙ МЕТОД ==========
 
     private Habit getHabitByIdEntity(Long id) {
         return habitRepository.findById(id)
