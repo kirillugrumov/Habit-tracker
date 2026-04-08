@@ -34,3 +34,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### Postman ###
+.postman
+postman
+
+### Logs ###
+hs_err_pid5420.log
+*.log
