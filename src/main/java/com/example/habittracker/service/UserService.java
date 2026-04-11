@@ -1,5 +1,6 @@
 package com.example.habittracker.service;
 
+import com.example.habittracker.cache.HabitSearchCache;
 import com.example.habittracker.dto.CreateUserRequest;
 import com.example.habittracker.dto.UpdateUserRequest;
 import com.example.habittracker.dto.UserResponseDto;
@@ -18,23 +19,28 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final HabitSearchCache habitSearchCache;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository,
+                       UserMapper userMapper,
+                       HabitSearchCache habitSearchCache) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.habitSearchCache = habitSearchCache;
     }
 
     @Transactional
     public UserResponseDto createUser(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new EntityExistsException("Пользователь с именем '" + request.getUsername() + "' уже существует");
+            throw new EntityExistsException("User with username '" + request.getUsername() + "' already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EntityExistsException("Пользователь с email '" + request.getEmail() + "' уже существует");
+            throw new EntityExistsException("User with email '" + request.getEmail() + "' already exists");
         }
 
         User user = userMapper.toEntity(request);
         User savedUser = userRepository.save(user);
+        habitSearchCache.invalidateAll();
         return userMapper.toResponseDto(savedUser);
     }
 
@@ -50,7 +56,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден с id: " + id));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
         return userMapper.toResponseDto(user);
     }
@@ -61,32 +67,34 @@ public class UserService {
 
         if (request.getUsername() != null && !request.getUsername().equals(user.getUsername())) {
             if (userRepository.existsByUsername(request.getUsername())) {
-                throw new EntityExistsException("Имя '" + request.getUsername() + "' уже занято");
+                throw new EntityExistsException("Name '" + request.getUsername() + "' is already taken");
             }
             user.setUsername(request.getUsername());
         }
 
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
-                throw new EntityExistsException("Email '" + request.getEmail() + "' уже занят");
+                throw new EntityExistsException("Email '" + request.getEmail() + "' is already taken");
             }
             user.setEmail(request.getEmail());
         }
 
         User updatedUser = userRepository.save(user);
+        habitSearchCache.invalidateAll();
         return userMapper.toResponseDto(updatedUser);
     }
 
     @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("Пользователь не найден с id: " + id);
+            throw new EntityNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
+        habitSearchCache.invalidateAll();
     }
 
     private User getUserByIdEntity(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден с id: " + id));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 }

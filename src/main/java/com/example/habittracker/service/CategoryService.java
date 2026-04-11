@@ -1,15 +1,16 @@
 package com.example.habittracker.service;
 
+import com.example.habittracker.cache.HabitSearchCache;
+import com.example.habittracker.dto.CategoryResponseDto;
 import com.example.habittracker.dto.CreateCategoryRequest;
 import com.example.habittracker.dto.UpdateCategoryRequest;
-import com.example.habittracker.dto.CategoryResponseDto;
 import com.example.habittracker.mapper.CategoryMapper;
 import com.example.habittracker.model.Category;
 import com.example.habittracker.repository.CategoryRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,10 +19,14 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final HabitSearchCache habitSearchCache;
 
-    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
+    public CategoryService(CategoryRepository categoryRepository,
+                           CategoryMapper categoryMapper,
+                           HabitSearchCache habitSearchCache) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
+        this.habitSearchCache = habitSearchCache;
     }
 
     @Transactional(readOnly = true)
@@ -42,13 +47,12 @@ public class CategoryService {
     @Transactional
     public CategoryResponseDto createCategory(CreateCategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())) {
-            throw new EntityExistsException(
-                    "Категория с именем '" + request.getName() + "' уже существует"
-            );
+            throw new EntityExistsException("Category with name '" + request.getName() + "' already exists");
         }
 
         Category category = categoryMapper.toEntity(request);
         Category savedCategory = categoryRepository.save(category);
+        habitSearchCache.invalidateAll();
         return categoryMapper.toResponseDto(savedCategory);
     }
 
@@ -58,7 +62,7 @@ public class CategoryService {
 
         if (request.getName() != null && !request.getName().equals(category.getName())) {
             if (categoryRepository.existsByName(request.getName())) {
-                throw new EntityExistsException("Имя '" + request.getName() + "' уже занято");
+                throw new EntityExistsException("Name '" + request.getName() + "' is already taken");
             }
             category.setName(request.getName());
         }
@@ -68,22 +72,23 @@ public class CategoryService {
         }
 
         Category updatedCategory = categoryRepository.save(category);
+        habitSearchCache.invalidateAll();
         return categoryMapper.toResponseDto(updatedCategory);
     }
 
     @Transactional
     public void deleteCategory(Long id) {
         if (!categoryRepository.existsById(id)) {
-            throw new EntityNotFoundException("Категория не найдена с id: " + id);
+            throw new EntityNotFoundException("Category not found with id: " + id);
         }
 
         categoryRepository.deleteCategoryLinks(id);
-
         categoryRepository.deleteById(id);
+        habitSearchCache.invalidateAll();
     }
 
     private Category getCategoryByIdEntity(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Категория не найдена с id: " + id));
+                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
     }
 }

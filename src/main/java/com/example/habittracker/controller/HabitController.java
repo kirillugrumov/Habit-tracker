@@ -6,6 +6,8 @@ import com.example.habittracker.dto.UpdateHabitRequest;
 import com.example.habittracker.dto.UserWithHabitResponseDto;
 import com.example.habittracker.dto.CreateUserWithHabitRequest;
 import com.example.habittracker.service.HabitService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -73,6 +76,32 @@ public class HabitController {
         return ResponseEntity.ok(habits);
     }
 
+    @GetMapping("/search/jpql")
+    public ResponseEntity<Page<HabitResponseDto>> searchHabitsJpql(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String categoryName,
+            Pageable pageable) {
+        Page<HabitResponseDto> habits = habitService.searchHabitsByUserAndCategoryJpql(
+                username,
+                categoryName,
+                pageable
+        );
+        return ResponseEntity.ok(habits);
+    }
+
+    @GetMapping("/search/native")
+    public ResponseEntity<Page<HabitResponseDto>> searchHabitsNative(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String categoryName,
+            Pageable pageable) {
+        Page<HabitResponseDto> habits = habitService.searchHabitsByUserAndCategoryNative(
+                username,
+                categoryName,
+                pageable
+        );
+        return ResponseEntity.ok(habits);
+    }
+
     @PostMapping("/demo/save-without-tx")
     public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithoutTransaction(
             @RequestBody CreateUserWithHabitRequest request) {
@@ -96,7 +125,4 @@ public class HabitController {
         );
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
-
-
 }
