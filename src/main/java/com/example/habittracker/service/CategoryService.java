@@ -76,6 +76,9 @@ public class CategoryService {
         if (!categoryRepository.existsById(id)) {
             throw new EntityNotFoundException("Категория не найдена с id: " + id);
         }
+
+        categoryRepository.deleteCategoryLinks(id);
+
         categoryRepository.deleteById(id);
     }
 
