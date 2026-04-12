@@ -6,12 +6,14 @@ import com.example.habittracker.dto.CreateCategoryRequest;
 import com.example.habittracker.dto.UpdateCategoryRequest;
 import com.example.habittracker.mapper.CategoryMapper;
 import com.example.habittracker.model.Category;
+import com.example.habittracker.model.Habit;
 import com.example.habittracker.repository.CategoryRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -78,12 +80,14 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategory(Long id) {
-        if (!categoryRepository.existsById(id)) {
-            throw new EntityNotFoundException("Category not found with id: " + id);
+        Category category = getCategoryByIdEntity(id);
+
+        List<Habit> habits = new ArrayList<>(category.getHabits());
+        for (Habit habit : habits) {
+            habit.removeCategory(category);
         }
 
-        categoryRepository.deleteCategoryLinks(id);
-        categoryRepository.deleteById(id);
+        categoryRepository.delete(category);
         habitSearchCache.invalidateAll();
     }
 
