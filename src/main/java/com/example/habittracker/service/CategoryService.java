@@ -9,7 +9,6 @@ import com.example.habittracker.model.Category;
 import com.example.habittracker.model.Habit;
 import com.example.habittracker.repository.CategoryRepository;
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
