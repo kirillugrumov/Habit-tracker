@@ -223,8 +223,7 @@ public class HabitService {
             return "";
         }
 
-        String trimmedValue = value.trim();
-        return trimmedValue;
+        return value.trim();
     }
 
     private void invalidateSearchCache() {
