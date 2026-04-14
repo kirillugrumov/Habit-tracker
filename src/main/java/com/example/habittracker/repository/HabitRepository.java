@@ -22,7 +22,7 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
 
     @Query(
             value = """
-                    SELECT DISTINCT h
+                    SELECT DISTINCT h.id
                     FROM Habit h
                     JOIN h.user u
                     LEFT JOIN h.categories c
@@ -38,9 +38,18 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
                       AND LOWER(COALESCE(c.name, '')) LIKE LOWER(CONCAT('%', :categoryName, '%'))
                     """
     )
-    Page<Habit> searchByUserAndCategoryJpql(@Param("username") String username,
-                                            @Param("categoryName") String categoryName,
-                                            Pageable pageable);
+    Page<Long> findHabitIdsByUserAndCategoryJpql(@Param("username") String username,
+                                                 @Param("categoryName") String categoryName,
+                                                 Pageable pageable);
+
+    @Query("""
+            SELECT DISTINCT h
+            FROM Habit h
+            JOIN FETCH h.user
+            LEFT JOIN FETCH h.categories
+            WHERE h.id IN :ids
+            """)
+    List<Habit> findAllWithUserAndCategoriesByIdIn(@Param("ids") List<Long> ids);
 
     @Query(
             value = """

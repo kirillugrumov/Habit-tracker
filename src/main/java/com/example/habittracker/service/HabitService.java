@@ -18,12 +18,15 @@ import com.example.habittracker.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class HabitService {
@@ -210,7 +213,7 @@ public class HabitService {
         }
 
         Page<Habit> habitsPage = queryType == HabitSearchQueryType.JPQL
-                ? habitRepository.searchByUserAndCategoryJpql(normalizedUsername, normalizedCategoryName, pageable)
+                ? findHabitsPageWithoutNPlusOne(normalizedUsername, normalizedCategoryName, pageable)
                 : habitRepository.searchByUserAndCategoryNative(normalizedUsername, normalizedCategoryName, pageable);
 
         Page<HabitResponseDto> responsePage = habitsPage.map(habitMapper::toResponseDto);
@@ -228,5 +231,34 @@ public class HabitService {
 
     private void invalidateSearchCache() {
         habitSearchCache.invalidateAll();
+    }
+
+    private Page<Habit> findHabitsPageWithoutNPlusOne(String username,
+                                                      String categoryName,
+                                                      Pageable pageable) {
+        Page<Long> habitIdsPage = habitRepository.findHabitIdsByUserAndCategoryJpql(
+                username,
+                categoryName,
+                pageable
+        );
+
+        if (habitIdsPage.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, habitIdsPage.getTotalElements());
+        }
+
+        List<Long> habitIds = habitIdsPage.getContent();
+        List<Habit> fetchedHabits = habitRepository.findAllWithUserAndCategoriesByIdIn(habitIds);
+
+        Map<Long, Habit> habitsById = new LinkedHashMap<>();
+        for (Habit habit : fetchedHabits) {
+            habitsById.put(habit.getId(), habit);
+        }
+
+        List<Habit> orderedHabits = habitIds.stream()
+                .map(habitsById::get)
+                .filter(habit -> habit != null)
+                .toList();
+
+        return new PageImpl<>(orderedHabits, pageable, habitIdsPage.getTotalElements());
     }
 }
