@@ -1,10 +1,20 @@
 package com.example.habittracker.dto;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
+@Schema(description = "Request body for updating a habit")
 public class UpdateHabitRequest {
+    @Schema(description = "Updated habit name", example = "Evening Workout")
+    @NotBlank(message = "Habit name is required")
     private String name;
-    private String description;
+
+    @Schema(description = "Updated habit description", example = "45 minutes of exercise after work")
+    private String description; // optional
+
+    @ArraySchema(schema = @Schema(description = "Category id", example = "3"))
     private List<Long> categoryIds;
 
     public UpdateHabitRequest() {

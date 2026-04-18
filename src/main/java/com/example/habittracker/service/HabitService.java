@@ -189,7 +189,7 @@ public class HabitService {
 
     private Habit getHabitByIdEntity(Long id) {
         return habitRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Habit not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Habit not found with id: " + id));
     }
 
     private Page<HabitResponseDto> searchHabits(String username,

@@ -1,12 +1,28 @@
 package com.example.habittracker.dto;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Schema(description = "Request body for creating a habit")
 public class CreateHabitRequest {
+    @Schema(description = "Habit name", example = "Morning Workout")
+    @NotBlank(message = "Habit name is required")
     private String name;
-    private String description;
+
+    @Schema(description = "Optional habit description", example = "30 minutes of exercise before breakfast")
+    private String description; // optional
+
+    @Schema(description = "Owner user id", example = "1")
+    @NotNull(message = "User ID is required")
+    @Positive(message = "User ID must be positive")
     private Long userId;
+    @ArraySchema(schema = @Schema(description = "Category id", example = "2"))
     private List<Long> categoryIds = new ArrayList<>();
 
     public CreateHabitRequest() {

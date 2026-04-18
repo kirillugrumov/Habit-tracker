@@ -9,6 +9,7 @@ import com.example.habittracker.model.Category;
 import com.example.habittracker.model.Habit;
 import com.example.habittracker.repository.CategoryRepository;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,6 +93,6 @@ public class CategoryService {
 
     private Category getCategoryByIdEntity(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + id));
     }
 }

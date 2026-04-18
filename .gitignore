@@ -41,5 +41,7 @@ build/
 postman
 
 ### Logs ###
-hs_err_pid5420.log
+logs/
+hs_err_pid*.log
 *.log
+*.log.gz

@@ -32,7 +32,9 @@ public class HabitLogService {
     @Transactional
     public HabitLogResponseDto createHabitLog(CreateHabitLogRequest request) {
         Habit habit = habitRepository.findById(request.getHabitId())
-                .orElseThrow(() -> new RuntimeException("Привычка не найдена"));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Habit not found with id: " + request.getHabitId()
+                ));
 
         LocalDate today = LocalDate.now();
 
@@ -60,13 +62,13 @@ public class HabitLogService {
     @Transactional
     public void deleteHabitLog(Long id) {
         if (!habitLogRepository.existsById(id)) {
-            throw new EntityNotFoundException("Лог не найден с id: " + id);
+            throw new EntityNotFoundException("Habit log not found with id: " + id);
         }
         habitLogRepository.deleteById(id);
     }
 
     private HabitLog getHabitLogByIdEntity(Long id) {
         return habitLogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Лог не найден с id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Habit log not found with id: " + id));
     }
 }

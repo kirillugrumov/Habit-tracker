@@ -1,8 +1,8 @@
 package com.example.habittracker.service;
 
 import com.example.habittracker.dto.CreateGoalRequest;
-import com.example.habittracker.dto.UpdateGoalRequest;
 import com.example.habittracker.dto.GoalResponseDto;
+import com.example.habittracker.dto.UpdateGoalRequest;
 import com.example.habittracker.mapper.GoalMapper;
 import com.example.habittracker.model.Goal;
 import com.example.habittracker.model.Habit;
@@ -33,11 +33,13 @@ public class GoalService {
     @Transactional
     public GoalResponseDto createGoal(CreateGoalRequest request) {
         if (goalRepository.existsByName(request.getName())) {
-            throw new EntityExistsException("Цель с именем '" + request.getName() + "' уже существует");
+            throw new EntityExistsException("Goal with name '" + request.getName() + "' already exists");
         }
 
         Habit habit = habitRepository.findById(request.getHabitId())
-                .orElseThrow(() -> new RuntimeException("Привычка не найдена с id: " + request.getHabitId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Habit not found with id: " + request.getHabitId()
+                ));
 
         Goal goal = goalMapper.toEntity(request, habit);
         Goal savedGoal = goalRepository.save(goal);
@@ -65,7 +67,7 @@ public class GoalService {
 
         if (request.getName() != null && !request.getName().equals(goal.getName())) {
             if (goalRepository.existsByName(request.getName())) {
-                throw new EntityExistsException("Имя '" + request.getName() + "' уже занято");
+                throw new EntityExistsException("Name '" + request.getName() + "' is already taken");
             }
             goal.setName(request.getName());
         }
@@ -76,7 +78,9 @@ public class GoalService {
 
         if (request.getHabitId() != null) {
             Habit habit = habitRepository.findById(request.getHabitId())
-                    .orElseThrow(() -> new RuntimeException("Привычка не найдена с id: " + request.getHabitId()));
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Habit not found with id: " + request.getHabitId()
+                    ));
             goal.setHabit(habit);
         }
 
@@ -87,13 +91,13 @@ public class GoalService {
     @Transactional
     public void deleteGoal(Long id) {
         if (!goalRepository.existsById(id)) {
-            throw new EntityNotFoundException("Цель не найдена с id: " + id);
+            throw new EntityNotFoundException("Goal not found with id: " + id);
         }
         goalRepository.deleteById(id);
     }
 
     private Goal getGoalByIdEntity(Long id) {
         return goalRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Цель не найдена с id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Goal not found with id: " + id));
     }
 }
