@@ -16,23 +16,25 @@ public class ServiceTimingAspect {
     @Around("execution(* com.example.habittracker.service..*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.nanoTime();
+        boolean success = false;
 
         try {
             Object result = joinPoint.proceed();
-            long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-            log.info("Executed {}.{} in {} ms",
-                    joinPoint.getSignature().getDeclaringTypeName(),
-                    joinPoint.getSignature().getName(),
-                    durationMs);
+            success = true;
             return result;
-        } catch (Throwable ex) {
+        } finally {
             long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-            log.error("Failed {}.{} after {} ms",
-                    joinPoint.getSignature().getDeclaringTypeName(),
-                    joinPoint.getSignature().getName(),
-                    durationMs,
-                    ex);
-            throw ex;
+            if (success) {
+                log.info("Executed {}.{} in {} ms",
+                        joinPoint.getSignature().getDeclaringTypeName(),
+                        joinPoint.getSignature().getName(),
+                        durationMs);
+            } else {
+                log.warn("Failed {}.{} after {} ms",
+                        joinPoint.getSignature().getDeclaringTypeName(),
+                        joinPoint.getSignature().getName(),
+                        durationMs);
+            }
         }
     }
 }
