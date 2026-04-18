@@ -27,12 +27,14 @@ public class ServiceTimingAspect {
             return result;
         } catch (Throwable ex) {
             long durationMs = (System.nanoTime() - startTime) / 1_000_000;
-            log.warn("Failed {}.{} after {} ms: {}",
-                    joinPoint.getSignature().getDeclaringTypeName(),
-                    joinPoint.getSignature().getName(),
-                    durationMs,
-                    ex.getMessage());
-            throw ex;
+
+            throw new RuntimeException(
+                    String.format("Failed %s.%s after %d ms",
+                            joinPoint.getSignature().getDeclaringTypeName(),
+                            joinPoint.getSignature().getName(),
+                            durationMs),
+                    ex
+            );
         }
     }
 }
