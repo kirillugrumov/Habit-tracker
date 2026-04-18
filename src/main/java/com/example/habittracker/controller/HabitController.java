@@ -13,7 +13,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -66,7 +74,8 @@ public class HabitController {
     }
 
     @GetMapping("/demo/problem")
-    @Operation(summary = "Demo N+1 problem", description = "Returns habits using the intentionally non-optimized query path.")
+    @Operation(summary = "Demo N+1 problem", description = "Returns habits using the intentionally" +
+            " non-optimized query path.")
     public ResponseEntity<List<HabitResponseDto>> demoProblem() {
         List<HabitResponseDto> habits = habitService.getHabitsWithProblem();
         return ResponseEntity.ok(habits);
@@ -94,7 +103,8 @@ public class HabitController {
     }
 
     @GetMapping("/search/native")
-    @Operation(summary = "Search habits via native SQL", description = "Searches habits by username and category using a native query.")
+    @Operation(summary = "Search habits via native SQL", description = "Searches habits by username and category " +
+            "using a native query.")
     public ResponseEntity<Page<HabitResponseDto>> searchHabitsNative(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String categoryName,
@@ -108,7 +118,8 @@ public class HabitController {
     }
 
     @PostMapping("/demo/save-without-tx")
-    @Operation(summary = "Create user and habit without transaction", description = "Demonstrates saving a user and habit without wrapping the operation in a transaction.")
+    @Operation(summary = "Create user and habit without transaction", description = "Demonstrates saving a user" +
+            " and habit without wrapping the operation in a transaction.")
     public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithoutTransaction(
             @Valid @RequestBody CreateUserWithHabitRequest request) {
         UserWithHabitResponseDto response = habitService.saveUserAndHabitWithoutTransaction(
@@ -121,7 +132,8 @@ public class HabitController {
     }
 
     @PostMapping("/demo/save-with-tx")
-    @Operation(summary = "Create user and habit with transaction", description = "Demonstrates saving a user and habit within a transaction.")
+    @Operation(summary = "Create user and habit with transaction", description = "Demonstrates saving a user" +
+            " and habit within a transaction.")
     public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithTransaction(
             @Valid @RequestBody CreateUserWithHabitRequest request) {
         UserWithHabitResponseDto response = habitService.saveUserAndHabitWithTransaction(

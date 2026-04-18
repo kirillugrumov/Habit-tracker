@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceTimingAspect {
 
-    private static final Logger log = LoggerFactory.getLogger(ServiceTimingAspect.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceTimingAspect.class);
 
     @Around("execution(* com.example.habittracker.service..*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -25,12 +25,12 @@ public class ServiceTimingAspect {
         } finally {
             long durationMs = (System.nanoTime() - startTime) / 1_000_000;
             if (success) {
-                log.info("Executed {}.{} in {} ms",
+                LOG.info("Executed {}.{} in {} ms",
                         joinPoint.getSignature().getDeclaringTypeName(),
                         joinPoint.getSignature().getName(),
                         durationMs);
             } else {
-                log.warn("Failed {}.{} after {} ms",
+                LOG.warn("Failed {}.{} after {} ms",
                         joinPoint.getSignature().getDeclaringTypeName(),
                         joinPoint.getSignature().getName(),
                         durationMs);

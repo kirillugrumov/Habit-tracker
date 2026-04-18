@@ -21,14 +21,14 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(
             EntityNotFoundException ex,
             HttpServletRequest request
     ) {
-        log.warn("Resource not found: {}", ex.getMessage());
+        LOG.warn("Resource not found: {}", ex.getMessage());
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
             EntityExistsException ex,
             HttpServletRequest request
     ) {
-        log.warn("Conflict detected: {}", ex.getMessage());
+        LOG.warn("Conflict detected: {}", ex.getMessage());
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
     }
 
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
                 .map(this::mapFieldError)
                 .toList();
 
-        log.warn("Validation failed for request {}: {}", request.getRequestURI(), ex.getMessage());
+        LOG.warn("Validation failed for request {}: {}", request.getRequestURI(), ex.getMessage());
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed",
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
                 ))
                 .toList();
 
-        log.warn("Constraint violation for request {}: {}", request.getRequestURI(), ex.getMessage());
+        LOG.warn("Constraint violation for request {}: {}", request.getRequestURI(), ex.getMessage());
         return buildResponse(
                 HttpStatus.BAD_REQUEST,
                 "Validation failed",
@@ -85,16 +85,16 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            HttpMessageNotReadableException.class,
-            MissingServletRequestParameterException.class,
-            MethodArgumentTypeMismatchException.class,
-            IllegalArgumentException.class
+        HttpMessageNotReadableException.class,
+        MissingServletRequestParameterException.class,
+        MethodArgumentTypeMismatchException.class,
+        IllegalArgumentException.class
     })
     public ResponseEntity<ApiErrorResponse> handleBadRequest(
             Exception ex,
             HttpServletRequest request
     ) {
-        log.warn("Bad request for {}: {}", request.getRequestURI(), ex.getMessage());
+        LOG.warn("Bad request for {}: {}", request.getRequestURI(), ex.getMessage());
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
     }
 
@@ -103,7 +103,7 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
-        log.error("Unexpected error while processing {}", request.getRequestURI(), ex);
+        LOG.error("Unexpected error while processing {}", request.getRequestURI(), ex);
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred",
