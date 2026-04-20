@@ -19,7 +19,7 @@ public class OpenApiConfig {
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Habit Tracker Team")
-                                .email("support@habittracker.local"))
+                                .email("kirill.ugrumov22@gmail.com"))
                         .license(new License()
                                 .name("Educational Use")));
     }
