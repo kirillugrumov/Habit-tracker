@@ -39,15 +39,15 @@ public class GoalController {
     @PostMapping
     @Operation(summary = "Create goal", description = "Creates a new goal linked to a habit.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Goal created",
+        @ApiResponse(responseCode = "201", description = "Goal created",
                     content = @Content(schema = @Schema(implementation = GoalResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Related habit not found",
+        @ApiResponse(responseCode = "404", description = "Related habit not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Goal already exists",
+        @ApiResponse(responseCode = "409", description = "Goal already exists",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<GoalResponseDto> createGoal(@Valid @RequestBody CreateGoalRequest request) {
@@ -58,8 +58,8 @@ public class GoalController {
     @GetMapping
     @Operation(summary = "Get all goals", description = "Returns all saved goals.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Goals returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "200", description = "Goals returned successfully"),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<GoalResponseDto>> getAllGoals() {
@@ -70,11 +70,11 @@ public class GoalController {
     @GetMapping("/{id}")
     @Operation(summary = "Get goal by id", description = "Returns a goal by its identifier.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Goal returned successfully",
+        @ApiResponse(responseCode = "200", description = "Goal returned successfully",
                     content = @Content(schema = @Schema(implementation = GoalResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Goal not found",
+        @ApiResponse(responseCode = "404", description = "Goal not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<GoalResponseDto> getGoalById(@PathVariable Long id) {
@@ -85,15 +85,15 @@ public class GoalController {
     @PutMapping("/{id}")
     @Operation(summary = "Update goal", description = "Updates an existing goal by id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Goal updated successfully",
+        @ApiResponse(responseCode = "200", description = "Goal updated successfully",
                     content = @Content(schema = @Schema(implementation = GoalResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Goal or related habit not found",
+        @ApiResponse(responseCode = "404", description = "Goal or related habit not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Goal data conflict",
+        @ApiResponse(responseCode = "409", description = "Goal data conflict",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<GoalResponseDto> updateGoal(
@@ -106,10 +106,10 @@ public class GoalController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete goal", description = "Deletes a goal by id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Goal deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Goal not found",
+        @ApiResponse(responseCode = "204", description = "Goal deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Goal not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<Void> deleteGoal(@PathVariable Long id) {

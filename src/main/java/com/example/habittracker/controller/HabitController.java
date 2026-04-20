@@ -44,15 +44,15 @@ public class HabitController {
     @PostMapping
     @Operation(summary = "Create habit", description = "Creates a new habit for a user.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Habit created",
+        @ApiResponse(responseCode = "201", description = "Habit created",
                     content = @Content(schema = @Schema(implementation = HabitResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "User or category not found",
+        @ApiResponse(responseCode = "404", description = "User or category not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Habit already exists",
+        @ApiResponse(responseCode = "409", description = "Habit already exists",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<HabitResponseDto> createHabit(@Valid @RequestBody CreateHabitRequest request) {
@@ -63,8 +63,8 @@ public class HabitController {
     @GetMapping
     @Operation(summary = "Get all habits", description = "Returns all habits.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Habits returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "200", description = "Habits returned successfully"),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<HabitResponseDto>> getAllHabits() {
@@ -75,11 +75,11 @@ public class HabitController {
     @GetMapping("/{id}")
     @Operation(summary = "Get habit by id", description = "Returns a habit by its identifier.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Habit returned successfully",
+        @ApiResponse(responseCode = "200", description = "Habit returned successfully",
                     content = @Content(schema = @Schema(implementation = HabitResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Habit not found",
+        @ApiResponse(responseCode = "404", description = "Habit not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<HabitResponseDto> getHabitById(@PathVariable Long id) {
@@ -90,15 +90,15 @@ public class HabitController {
     @PutMapping("/{id}")
     @Operation(summary = "Update habit", description = "Updates an existing habit by id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Habit updated successfully",
+        @ApiResponse(responseCode = "200", description = "Habit updated successfully",
                     content = @Content(schema = @Schema(implementation = HabitResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Habit or category not found",
+        @ApiResponse(responseCode = "404", description = "Habit or category not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Habit data conflict",
+        @ApiResponse(responseCode = "409", description = "Habit data conflict",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<HabitResponseDto> updateHabit(
@@ -111,10 +111,10 @@ public class HabitController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete habit", description = "Deletes a habit by id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Habit deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Habit not found",
+        @ApiResponse(responseCode = "204", description = "Habit deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Habit not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<Void> deleteHabit(@PathVariable Long id) {
@@ -126,8 +126,8 @@ public class HabitController {
     @Operation(summary = "Demo N+1 problem", description = "Returns habits using the intentionally" +
             " non-optimized query path.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Habits returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "200", description = "Habits returned successfully"),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<HabitResponseDto>> demoProblem() {
@@ -138,8 +138,8 @@ public class HabitController {
     @GetMapping("/demo/solution")
     @Operation(summary = "Demo N+1 solution", description = "Returns habits using the optimized query path.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Habits returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "200", description = "Habits returned successfully"),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<HabitResponseDto>> demoSolution() {
@@ -150,10 +150,10 @@ public class HabitController {
     @GetMapping("/search/jpql")
     @Operation(summary = "Search habits via JPQL", description = "Searches habits by username and category using JPQL.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Search result returned successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request parameters",
+        @ApiResponse(responseCode = "200", description = "Search result returned successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad request parameters",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<Page<HabitResponseDto>> searchHabitsJpql(
@@ -172,10 +172,10 @@ public class HabitController {
     @Operation(summary = "Search habits via native SQL", description = "Searches habits by username and category " +
             "using a native query.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Search result returned successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request parameters",
+        @ApiResponse(responseCode = "200", description = "Search result returned successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad request parameters",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<Page<HabitResponseDto>> searchHabitsNative(
@@ -194,11 +194,11 @@ public class HabitController {
     @Operation(summary = "Create user and habit without transaction", description = "Demonstrates saving a user" +
             " and habit without wrapping the operation in a transaction.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "User and habit created",
+        @ApiResponse(responseCode = "201", description = "User and habit created",
                     content = @Content(schema = @Schema(implementation = UserWithHabitResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithoutTransaction(
@@ -216,11 +216,11 @@ public class HabitController {
     @Operation(summary = "Create user and habit with transaction", description = "Demonstrates saving a user" +
             " and habit within a transaction.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "User and habit created",
+        @ApiResponse(responseCode = "201", description = "User and habit created",
                     content = @Content(schema = @Schema(implementation = UserWithHabitResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<UserWithHabitResponseDto> saveUserAndHabitWithTransaction(

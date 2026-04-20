@@ -39,8 +39,8 @@ public class CategoryController {
     @GetMapping
     @Operation(summary = "Get all categories", description = "Returns the full list of categories.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Categories returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "200", description = "Categories returned successfully"),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<CategoryResponseDto>> getAllCategories() {
@@ -51,11 +51,11 @@ public class CategoryController {
     @GetMapping("/{id}")
     @Operation(summary = "Get category by id", description = "Returns a category by its identifier.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Category returned successfully",
+        @ApiResponse(responseCode = "200", description = "Category returned successfully",
                     content = @Content(schema = @Schema(implementation = CategoryResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Category not found",
+        @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable Long id) {
@@ -63,16 +63,17 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     @PostMapping
     @Operation(summary = "Create category", description = "Creates a new category from the request body.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Category created",
+        @ApiResponse(responseCode = "201", description = "Category created",
                     content = @Content(schema = @Schema(implementation = CategoryResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Category already exists",
+        @ApiResponse(responseCode = "409", description = "Category already exists",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<CategoryResponseDto> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
@@ -83,15 +84,15 @@ public class CategoryController {
     @PutMapping("/{id}")
     @Operation(summary = "Update category", description = "Updates an existing category by id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Category updated successfully",
+        @ApiResponse(responseCode = "200", description = "Category updated successfully",
                     content = @Content(schema = @Schema(implementation = CategoryResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Category not found",
+        @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Category data conflict",
+        @ApiResponse(responseCode = "409", description = "Category data conflict",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<CategoryResponseDto> updateCategory(
@@ -104,10 +105,10 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete category", description = "Deletes a category by id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Category deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Category not found",
+        @ApiResponse(responseCode = "204", description = "Category deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Category not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {

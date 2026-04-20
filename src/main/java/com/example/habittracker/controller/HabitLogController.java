@@ -37,13 +37,13 @@ public class HabitLogController {
     @PostMapping
     @Operation(summary = "Create habit log", description = "Creates a log entry for a habit.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Habit log created",
+        @ApiResponse(responseCode = "201", description = "Habit log created",
                     content = @Content(schema = @Schema(implementation = HabitLogResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Validation error",
+        @ApiResponse(responseCode = "400", description = "Validation error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Habit not found",
+        @ApiResponse(responseCode = "404", description = "Habit not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<HabitLogResponseDto> createHabitLog(@Valid @RequestBody CreateHabitLogRequest request) {
@@ -54,8 +54,8 @@ public class HabitLogController {
     @GetMapping
     @Operation(summary = "Get all habit logs", description = "Returns all habit log entries.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Habit logs returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "200", description = "Habit logs returned successfully"),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<List<HabitLogResponseDto>> getAllHabitLogs() {
@@ -66,11 +66,11 @@ public class HabitLogController {
     @GetMapping("/{id}")
     @Operation(summary = "Get habit log by id", description = "Returns a habit log by its identifier.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Habit log returned successfully",
+        @ApiResponse(responseCode = "200", description = "Habit log returned successfully",
                     content = @Content(schema = @Schema(implementation = HabitLogResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "Habit log not found",
+        @ApiResponse(responseCode = "404", description = "Habit log not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<HabitLogResponseDto> getHabitLogById(@PathVariable Long id) {
@@ -81,10 +81,10 @@ public class HabitLogController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete habit log", description = "Deletes a habit log by id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Habit log deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Habit log not found",
+        @ApiResponse(responseCode = "204", description = "Habit log deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Habit log not found",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Unexpected server error",
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<Void> deleteHabitLog(@PathVariable Long id) {
