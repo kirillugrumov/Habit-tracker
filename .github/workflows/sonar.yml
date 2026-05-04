@@ -57,8 +57,6 @@ jobs:
             exit 1
           fi
 
-          SONAR_HOST_URL="${SONAR_HOST_URL%/}"
-
           if [[ "${SONAR_HOST_URL}" == "https://sonarcloud.io" ]] && [ -z "${SONAR_ORGANIZATION:-}" ]; then
             echo "SONAR_ORGANIZATION repository variable is required for SonarCloud"
             exit 1
