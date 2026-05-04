@@ -98,7 +98,7 @@ class HabitServiceTest {
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(habitRepository.existsByName("Run")).thenReturn(false);
-        when(habitMapper.toEntity(request, null)).thenReturn(habit);
+        when(habitMapper.toEntity(request, List.of())).thenReturn(habit);
         when(habitRepository.save(habit)).thenReturn(savedHabit);
         when(habitMapper.toResponseDto(savedHabit)).thenReturn(dto);
 
@@ -180,8 +180,10 @@ class HabitServiceTest {
     @Test
     void searchHabitsByUserAndCategoryJpql_shouldFilterOutMissingHabits() {
         Pageable pageable = PageRequest.of(0, 10);
+        // Явно указываем totalElements = 2, content = [1L, 2L]
         Page<Long> idsPage = new PageImpl<>(List.of(1L, 2L), pageable, 2);
-        // Репозиторий вернул только habit с id=2, а habit с id=1 отсутствует
+
+        // Репозиторий вернул только habit с id=2, habit с id=1 отсутствует
         Habit habit2 = createHabit(2L, "Read", "desc");
         List<Habit> fetchedHabits = List.of(habit2);
         HabitResponseDto dto2 = createHabitResponseDto(2L, "Read");
@@ -196,7 +198,7 @@ class HabitServiceTest {
         // Должен вернуться только habit с id=2
         assertEquals(1, result.getContent().size());
         assertEquals(2L, result.getContent().get(0).getId());
-        // total elements должно остаться 2 (как в idsPage)
+        // Общее количество элементов остаётся 2 (как в idsPage)
         assertEquals(2, result.getTotalElements());
     }
 
