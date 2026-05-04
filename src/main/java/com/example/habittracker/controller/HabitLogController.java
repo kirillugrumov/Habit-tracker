@@ -1,6 +1,8 @@
 package com.example.habittracker.controller;
 
+import com.example.habittracker.dto.BulkHabitLogResponseDto;
 import com.example.habittracker.dto.CreateHabitLogRequest;
+import com.example.habittracker.dto.CreateHabitLogsBulkRequest;
 import com.example.habittracker.dto.HabitLogResponseDto;
 import com.example.habittracker.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,6 +51,71 @@ public class HabitLogController {
     public ResponseEntity<HabitLogResponseDto> createHabitLog(@Valid @RequestBody CreateHabitLogRequest request) {
         HabitLogResponseDto savedLog = habitLogService.createHabitLog(request);
         return new ResponseEntity<>(savedLog, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/bulk")
+    @Operation(summary = "Create habit logs in bulk",
+            description = "Creates log entries for several habits in one request.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Habit logs created",
+                content = @Content(schema = @Schema(implementation = BulkHabitLogResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "Validation error",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "One or more habits not found",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Habit log already exists for today",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    public ResponseEntity<BulkHabitLogResponseDto> createHabitLogsBulk(
+            @Valid @RequestBody CreateHabitLogsBulkRequest request) {
+        BulkHabitLogResponseDto savedLogs = habitLogService.createHabitLogsBulk(request);
+        return new ResponseEntity<>(savedLogs, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/demo/bulk-without-tx")
+    @Operation(summary = "Create habit logs in bulk without transaction",
+            description = "Demonstrates partial persistence when one of the bulk items fails and the service method "
+                    + "is not transactional.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Habit logs created",
+                content = @Content(schema = @Schema(implementation = BulkHabitLogResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "Validation error",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "One or more habits not found",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Habit log already exists for today",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    public ResponseEntity<BulkHabitLogResponseDto> createHabitLogsBulkWithoutTransaction(
+            @Valid @RequestBody CreateHabitLogsBulkRequest request) {
+        BulkHabitLogResponseDto savedLogs = habitLogService.createHabitLogsBulkWithoutTransaction(request);
+        return new ResponseEntity<>(savedLogs, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/demo/bulk-with-tx")
+    @Operation(summary = "Create habit logs in bulk with transaction",
+            description = "Demonstrates rollback of the whole bulk operation when one of the bulk items fails and "
+                    + "the service method is transactional.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Habit logs created",
+                content = @Content(schema = @Schema(implementation = BulkHabitLogResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "Validation error",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "One or more habits not found",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Habit log already exists for today",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Unexpected server error",
+                content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    public ResponseEntity<BulkHabitLogResponseDto> createHabitLogsBulkWithTransaction(
+            @Valid @RequestBody CreateHabitLogsBulkRequest request) {
+        BulkHabitLogResponseDto savedLogs = habitLogService.createHabitLogsBulkWithTransaction(request);
+        return new ResponseEntity<>(savedLogs, HttpStatus.CREATED);
     }
 
     @GetMapping

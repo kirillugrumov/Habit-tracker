@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
@@ -17,7 +18,12 @@ import java.time.LocalDate;
 public class HabitLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "habit_log_seq_generator",
+            sequenceName = "habit_log_seq",
+            allocationSize = 50
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "habit_log_seq_generator")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
