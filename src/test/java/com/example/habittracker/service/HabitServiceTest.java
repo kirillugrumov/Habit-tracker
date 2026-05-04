@@ -148,6 +148,26 @@ class HabitServiceTest {
     }
 
     @Test
+    void createHabit_shouldEnterCategoryBlock_whenCategoryIdsProvided() {
+        CreateHabitRequest request = new CreateHabitRequest("Run", "desc", 1L, List.of(5L));
+        User user = createUser(1L, "john", "john@mail.com");
+        Category cat = createCategory(5L, "Sport");
+        Habit habit = createHabit(null, "Run", "desc");
+        Habit savedHabit = createHabit(10L, "Run", "desc");
+        HabitResponseDto dto = createHabitResponseDto(10L, "Run");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(habitRepository.existsByName("Run")).thenReturn(false);
+        when(categoryRepository.findAllById(List.of(5L))).thenReturn(List.of(cat));
+        when(habitMapper.toEntity(request, List.of(cat))).thenReturn(habit);
+        when(habitRepository.save(habit)).thenReturn(savedHabit);
+        when(habitMapper.toResponseDto(savedHabit)).thenReturn(dto);
+
+        habitService.createHabit(request);
+        verify(categoryRepository).findAllById(List.of(5L));
+    }
+
+    @Test
     void updateHabit_shouldNotUpdateName_whenNameIsSame() {
         Habit habit = createHabit(1L, "Run", "old desc");
         UpdateHabitRequest request = new UpdateHabitRequest("Run", "new desc", null);
