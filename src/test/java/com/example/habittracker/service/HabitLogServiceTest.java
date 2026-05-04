@@ -232,6 +232,110 @@ class HabitLogServiceTest {
     }
 
     @Test
+    void createHabitLogsBulkWithoutTransaction_shouldCreateAllLogsWhenValid() {
+        CreateHabitLogRequest firstRequest = new CreateHabitLogRequest(1L);
+        CreateHabitLogRequest secondRequest = new CreateHabitLogRequest(2L);
+        CreateHabitLogsBulkRequest request = new CreateHabitLogsBulkRequest(List.of(firstRequest, secondRequest));
+        Habit firstHabit = createHabit(1L);
+        Habit secondHabit = createHabit(2L);
+        HabitLog firstLogToSave = new HabitLog(firstHabit, null);
+        HabitLog secondLogToSave = new HabitLog(secondHabit, null);
+        HabitLog savedFirstLog = createHabitLog(211L, firstHabit, LocalDate.now());
+        HabitLog savedSecondLog = createHabitLog(212L, secondHabit, LocalDate.now());
+        HabitLogResponseDto firstResponse = new HabitLogResponseDto(211L, 1L, LocalDate.now());
+        HabitLogResponseDto secondResponse = new HabitLogResponseDto(212L, 2L, LocalDate.now());
+
+        when(habitRepository.findById(1L)).thenReturn(Optional.of(firstHabit));
+        when(habitRepository.findById(2L)).thenReturn(Optional.of(secondHabit));
+        when(habitLogRepository.existsByHabitIdAndDate(eq(1L), any(LocalDate.class))).thenReturn(false);
+        when(habitLogRepository.existsByHabitIdAndDate(eq(2L), any(LocalDate.class))).thenReturn(false);
+        when(habitLogMapper.toEntity(same(firstRequest), same(firstHabit))).thenReturn(firstLogToSave);
+        when(habitLogMapper.toEntity(same(secondRequest), same(secondHabit))).thenReturn(secondLogToSave);
+        when(habitLogRepository.save(firstLogToSave)).thenReturn(savedFirstLog);
+        when(habitLogRepository.save(secondLogToSave)).thenReturn(savedSecondLog);
+        when(habitLogMapper.toResponseDto(savedFirstLog)).thenReturn(firstResponse);
+        when(habitLogMapper.toResponseDto(savedSecondLog)).thenReturn(secondResponse);
+
+        BulkHabitLogResponseDto result = habitLogService.createHabitLogsBulkWithoutTransaction(request);
+
+        assertEquals(List.of(firstResponse, secondResponse), result.getLogs());
+    }
+
+    @Test
+    void createHabitLogsBulkWithTransaction_shouldCreateAllLogsWhenValid() {
+        CreateHabitLogRequest firstRequest = new CreateHabitLogRequest(1L);
+        CreateHabitLogRequest secondRequest = new CreateHabitLogRequest(2L);
+        CreateHabitLogsBulkRequest request = new CreateHabitLogsBulkRequest(List.of(firstRequest, secondRequest));
+        Habit firstHabit = createHabit(1L);
+        Habit secondHabit = createHabit(2L);
+        HabitLog firstLogToSave = new HabitLog(firstHabit, null);
+        HabitLog secondLogToSave = new HabitLog(secondHabit, null);
+        HabitLog savedFirstLog = createHabitLog(301L, firstHabit, LocalDate.now());
+        HabitLog savedSecondLog = createHabitLog(302L, secondHabit, LocalDate.now());
+        HabitLogResponseDto firstResponse = new HabitLogResponseDto(301L, 1L, LocalDate.now());
+        HabitLogResponseDto secondResponse = new HabitLogResponseDto(302L, 2L, LocalDate.now());
+
+        when(habitRepository.findById(1L)).thenReturn(Optional.of(firstHabit));
+        when(habitRepository.findById(2L)).thenReturn(Optional.of(secondHabit));
+        when(habitLogRepository.existsByHabitIdAndDate(eq(1L), any(LocalDate.class))).thenReturn(false);
+        when(habitLogRepository.existsByHabitIdAndDate(eq(2L), any(LocalDate.class))).thenReturn(false);
+        when(habitLogMapper.toEntity(same(firstRequest), same(firstHabit))).thenReturn(firstLogToSave);
+        when(habitLogMapper.toEntity(same(secondRequest), same(secondHabit))).thenReturn(secondLogToSave);
+        when(habitLogRepository.save(firstLogToSave)).thenReturn(savedFirstLog);
+        when(habitLogRepository.save(secondLogToSave)).thenReturn(savedSecondLog);
+        when(habitLogMapper.toResponseDto(savedFirstLog)).thenReturn(firstResponse);
+        when(habitLogMapper.toResponseDto(savedSecondLog)).thenReturn(secondResponse);
+
+        BulkHabitLogResponseDto result = habitLogService.createHabitLogsBulkWithTransaction(request);
+
+        assertEquals(List.of(firstResponse, secondResponse), result.getLogs());
+    }
+
+    @Test
+    void getAllHabitLogs_shouldReturnMappedDtos() {
+        Habit firstHabit = createHabit(1L);
+        Habit secondHabit = createHabit(2L);
+        HabitLog firstLog = createHabitLog(10L, firstHabit, LocalDate.now());
+        HabitLog secondLog = createHabitLog(11L, secondHabit, LocalDate.now());
+        HabitLogResponseDto firstDto = new HabitLogResponseDto(10L, 1L, LocalDate.now());
+        HabitLogResponseDto secondDto = new HabitLogResponseDto(11L, 2L, LocalDate.now());
+
+        when(habitLogRepository.findAll()).thenReturn(List.of(firstLog, secondLog));
+        when(habitLogMapper.toResponseDto(firstLog)).thenReturn(firstDto);
+        when(habitLogMapper.toResponseDto(secondLog)).thenReturn(secondDto);
+
+        List<HabitLogResponseDto> result = habitLogService.getAllHabitLogs();
+
+        assertEquals(List.of(firstDto, secondDto), result);
+    }
+
+    @Test
+    void getHabitLogById_shouldReturnMappedDto() {
+        Habit habit = createHabit(1L);
+        HabitLog habitLog = createHabitLog(10L, habit, LocalDate.now());
+        HabitLogResponseDto dto = new HabitLogResponseDto(10L, 1L, LocalDate.now());
+
+        when(habitLogRepository.findById(10L)).thenReturn(Optional.of(habitLog));
+        when(habitLogMapper.toResponseDto(habitLog)).thenReturn(dto);
+
+        HabitLogResponseDto result = habitLogService.getHabitLogById(10L);
+
+        assertEquals(dto, result);
+    }
+
+    @Test
+    void getHabitLogById_shouldThrowWhenMissing() {
+        when(habitLogRepository.findById(10L)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> habitLogService.getHabitLogById(10L)
+        );
+
+        assertEquals("Habit log not found with id: 10", exception.getMessage());
+    }
+
+    @Test
     void deleteHabitLog_shouldDeleteWhenLogExists() {
         when(habitLogRepository.existsById(5L)).thenReturn(true);
 
