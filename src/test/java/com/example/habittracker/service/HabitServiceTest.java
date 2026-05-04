@@ -148,6 +148,21 @@ class HabitServiceTest {
     }
 
     @Test
+    void createHabit_shouldHandleEmptyMutableList() {
+        CreateHabitRequest request = new CreateHabitRequest("Run", "desc", 1L, new ArrayList<>());
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(createUser(1L, "john", "john@mail.com")));
+        when(habitRepository.existsByName("Run")).thenReturn(false);
+        when(habitMapper.toEntity(request, List.of())).thenReturn(createHabit(null, "Run", "desc"));
+        when(habitRepository.save(any())).thenReturn(createHabit(1L, "Run", "desc"));
+        when(habitMapper.toResponseDto(any())).thenReturn(createHabitResponseDto(1L, "Run"));
+
+        habitService.createHabit(request);
+
+        verify(categoryRepository, never()).findAllById(any());
+    }
+
+    @Test
     void createHabit_shouldEnterCategoryBlock_whenCategoryIdsProvided() {
         CreateHabitRequest request = new CreateHabitRequest("Run", "desc", 1L, List.of(5L));
         User user = createUser(1L, "john", "john@mail.com");
