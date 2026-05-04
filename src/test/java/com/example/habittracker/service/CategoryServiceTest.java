@@ -193,4 +193,61 @@ class CategoryServiceTest {
         category.setDescription(description);
         return category;
     }
+
+    // ========== ПОКРЫТИЕ ВЕТОК В updateCategory ==========
+
+    @Test
+    void updateCategory_shouldNotUpdateName_whenNameIsNull() {
+        Category category = createCategory(1L, "Health", "old desc");
+        UpdateCategoryRequest request = new UpdateCategoryRequest(null, "new desc");
+
+        // Ожидаемый DTO: имя осталось "Health", описание изменилось на "new desc"
+        CategoryResponseDto dto = new CategoryResponseDto(1L, "Health", "new desc");
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.toResponseDto(category)).thenReturn(dto);
+
+        CategoryResponseDto result = categoryService.updateCategory(1L, request);
+
+        assertEquals("Health", category.getName()); // имя не изменилось
+        assertEquals("new desc", category.getDescription());
+        verify(categoryRepository, never()).existsByName(any());
+        verify(habitSearchCache).invalidateAll();
+    }
+
+    @Test
+    void updateCategory_shouldNotUpdateName_whenNameIsSame() {
+        Category category = createCategory(1L, "Health", "old desc");
+        UpdateCategoryRequest request = new UpdateCategoryRequest("Health", "new desc");
+        CategoryResponseDto dto = new CategoryResponseDto(1L, "Health", "new desc");
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.toResponseDto(category)).thenReturn(dto);
+
+        CategoryResponseDto result = categoryService.updateCategory(1L, request);
+
+        assertEquals("Health", category.getName());
+        // проверка существования не должна вызываться
+        verify(categoryRepository, never()).existsByName(any());
+    }
+
+    @Test
+    void updateCategory_shouldNotUpdateDescription_whenDescriptionIsNull() {
+        Category category = createCategory(1L, "Health", "old desc");
+        UpdateCategoryRequest request = new UpdateCategoryRequest("Fitness", null);
+        CategoryResponseDto dto = new CategoryResponseDto(1L, "Fitness", "old desc");
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(categoryRepository.existsByName("Fitness")).thenReturn(false);
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.toResponseDto(category)).thenReturn(dto);
+
+        CategoryResponseDto result = categoryService.updateCategory(1L, request);
+
+        assertEquals("Fitness", category.getName());
+        assertEquals("old desc", category.getDescription()); // описание не изменилось
+        verify(categoryRepository).existsByName("Fitness");
+    }
 }

@@ -89,6 +89,118 @@ class HabitServiceTest {
     }
 
     @Test
+    void createHabit_shouldSaveHabit_whenCategoryIdsIsNull() {
+        CreateHabitRequest request = new CreateHabitRequest("Run", "Morning run", 1L, null);
+        User user = createUser(1L, "john", "john@mail.com");
+        Habit habit = createHabit(null, "Run", "Morning run");
+        Habit savedHabit = createHabit(10L, "Run", "Morning run");
+        HabitResponseDto dto = createHabitResponseDto(10L, "Run");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(habitRepository.existsByName("Run")).thenReturn(false);
+        when(habitMapper.toEntity(request, null)).thenReturn(habit);
+        when(habitRepository.save(habit)).thenReturn(savedHabit);
+        when(habitMapper.toResponseDto(savedHabit)).thenReturn(dto);
+
+        HabitResponseDto result = habitService.createHabit(request);
+
+        assertEquals(dto, result);
+        verify(categoryRepository, never()).findAllById(any());
+    }
+
+    @Test
+    void createHabit_shouldSaveHabitWithCategories_whenAllCategoriesFound() {
+        CreateHabitRequest request = new CreateHabitRequest("Run", "Morning run", 1L, List.of(1L, 2L));
+        User user = createUser(1L, "john", "john@mail.com");
+        Category cat1 = createCategory(1L, "Health");
+        Category cat2 = createCategory(2L, "Sport");
+        List<Category> categories = List.of(cat1, cat2);
+        Habit habit = createHabit(null, "Run", "Morning run");
+        Habit savedHabit = createHabit(10L, "Run", "Morning run");
+        HabitResponseDto dto = createHabitResponseDto(10L, "Run");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(habitRepository.existsByName("Run")).thenReturn(false);
+        when(categoryRepository.findAllById(List.of(1L, 2L))).thenReturn(categories);
+        when(habitMapper.toEntity(request, categories)).thenReturn(habit);
+        when(habitRepository.save(habit)).thenReturn(savedHabit);
+        when(habitMapper.toResponseDto(savedHabit)).thenReturn(dto);
+
+        HabitResponseDto result = habitService.createHabit(request);
+
+        assertEquals(dto, result);
+        verify(categoryRepository).findAllById(List.of(1L, 2L));
+    }
+
+    @Test
+    void updateHabit_shouldNotUpdateName_whenNameIsNull() {
+        Habit habit = createHabit(1L, "Old", "old desc");
+        UpdateHabitRequest request = new UpdateHabitRequest(null, "new desc", null);
+
+        when(habitRepository.findById(1L)).thenReturn(Optional.of(habit));
+        when(habitRepository.save(habit)).thenReturn(habit);
+        when(habitMapper.toResponseDto(habit)).thenReturn(createHabitResponseDto(1L, "Old"));
+
+        habitService.updateHabit(1L, request);
+
+        assertEquals("Old", habit.getName()); // имя не изменилось
+        verify(habitRepository, never()).existsByName(any());
+    }
+
+    @Test
+    void updateHabit_shouldNotUpdateName_whenNameIsSame() {
+        Habit habit = createHabit(1L, "Run", "old desc");
+        UpdateHabitRequest request = new UpdateHabitRequest("Run", "new desc", null);
+
+        when(habitRepository.findById(1L)).thenReturn(Optional.of(habit));
+        when(habitRepository.save(habit)).thenReturn(habit);
+        when(habitMapper.toResponseDto(habit)).thenReturn(createHabitResponseDto(1L, "Run"));
+
+        habitService.updateHabit(1L, request);
+
+        assertEquals("Run", habit.getName());
+        verify(habitRepository, never()).existsByName(any());
+    }
+
+    @Test
+    void updateHabit_shouldNotUpdateCategories_whenCategoryIdsIsNull() {
+        Habit habit = createHabit(1L, "Run", "desc");
+        UpdateHabitRequest request = new UpdateHabitRequest(null, null, null);
+
+        when(habitRepository.findById(1L)).thenReturn(Optional.of(habit));
+        when(habitRepository.save(habit)).thenReturn(habit);
+        when(habitMapper.toResponseDto(habit)).thenReturn(createHabitResponseDto(1L, "Run"));
+
+        habitService.updateHabit(1L, request);
+
+        // categories = null, updateEntity вызывается с null
+        verify(habitMapper).updateEntity(same(habit), same(request), eq(null));
+    }
+
+    @Test
+    void searchHabitsByUserAndCategoryJpql_shouldFilterOutMissingHabits() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Long> idsPage = new PageImpl<>(List.of(1L, 2L), pageable, 2);
+        // Репозиторий вернул только habit с id=2, а habit с id=1 отсутствует
+        Habit habit2 = createHabit(2L, "Read", "desc");
+        List<Habit> fetchedHabits = List.of(habit2);
+        HabitResponseDto dto2 = createHabitResponseDto(2L, "Read");
+
+        when(habitSearchCache.get(any(HabitSearchCacheKey.class))).thenReturn(null);
+        when(habitRepository.findHabitIdsByUserAndCategoryJpql("john", "health", pageable)).thenReturn(idsPage);
+        when(habitRepository.findAllWithUserAndCategoriesByIdIn(List.of(1L, 2L))).thenReturn(fetchedHabits);
+        when(habitMapper.toResponseDto(habit2)).thenReturn(dto2);
+
+        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql("john", "health", pageable);
+
+        // Должен вернуться только habit с id=2
+        assertEquals(1, result.getContent().size());
+        assertEquals(2L, result.getContent().get(0).getId());
+        // total elements должно остаться 2 (как в idsPage)
+        assertEquals(2, result.getTotalElements());
+    }
+
+    @Test
     void createHabit_shouldThrowWhenUserMissing() {
         CreateHabitRequest request = new CreateHabitRequest("Run", "Morning run", 1L, List.of());
         when(userRepository.findById(1L)).thenReturn(Optional.empty());

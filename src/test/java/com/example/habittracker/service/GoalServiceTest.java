@@ -212,4 +212,75 @@ class GoalServiceTest {
         goal.setHabit(habit);
         return goal;
     }
+
+    // ========== ПОКРЫТИЕ ВЕТОК В updateGoal ==========
+
+    @Test
+    void updateGoal_shouldNotUpdateName_whenNameIsNull() {
+        Habit habit = createHabit(1L);
+        Goal goal = createGoal(1L, "OldGoal", "OldCondition", habit);
+        UpdateGoalRequest request = new UpdateGoalRequest(null, "NewCondition", null);
+        GoalResponseDto dto = new GoalResponseDto(1L, "OldGoal", "NewCondition", 1L, "Habit");
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        when(goalRepository.save(goal)).thenReturn(goal);
+        when(goalMapper.toResponseDto(goal)).thenReturn(dto);
+
+        GoalResponseDto result = goalService.updateGoal(1L, request);
+
+        assertEquals("OldGoal", goal.getName());
+        assertEquals("NewCondition", goal.getCondition());
+        verify(goalRepository, never()).existsByName(any());
+    }
+
+    @Test
+    void updateGoal_shouldNotUpdateName_whenNameIsSame() {
+        Habit habit = createHabit(1L);
+        Goal goal = createGoal(1L, "SameGoal", "OldCondition", habit);
+        UpdateGoalRequest request = new UpdateGoalRequest("SameGoal", "NewCondition", null);
+        GoalResponseDto dto = new GoalResponseDto(1L, "SameGoal", "NewCondition", 1L, "Habit");
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        when(goalRepository.save(goal)).thenReturn(goal);
+        when(goalMapper.toResponseDto(goal)).thenReturn(dto);
+
+        GoalResponseDto result = goalService.updateGoal(1L, request);
+
+        assertEquals("SameGoal", goal.getName());
+        verify(goalRepository, never()).existsByName(any());
+    }
+
+    @Test
+    void updateGoal_shouldNotUpdateCondition_whenConditionIsNull() {
+        Habit habit = createHabit(1L);
+        Goal goal = createGoal(1L, "Goal", "OldCondition", habit);
+        UpdateGoalRequest request = new UpdateGoalRequest("NewName", null, null);
+        GoalResponseDto dto = new GoalResponseDto(1L, "NewName", "OldCondition", 1L, "Habit");
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        when(goalRepository.save(goal)).thenReturn(goal);
+        when(goalMapper.toResponseDto(goal)).thenReturn(dto);
+
+        GoalResponseDto result = goalService.updateGoal(1L, request);
+
+        assertEquals("OldCondition", goal.getCondition());
+        assertEquals("NewName", goal.getName());
+    }
+
+    @Test
+    void updateGoal_shouldNotUpdateHabit_whenHabitIdIsNull() {
+        Habit oldHabit = createHabit(1L);
+        Goal goal = createGoal(1L, "Goal", "Condition", oldHabit);
+        UpdateGoalRequest request = new UpdateGoalRequest("NewName", "NewCondition", null);
+        GoalResponseDto dto = new GoalResponseDto(1L, "NewName", "NewCondition", 1L, "Habit");
+
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        when(goalRepository.save(goal)).thenReturn(goal);
+        when(goalMapper.toResponseDto(goal)).thenReturn(dto);
+
+        GoalResponseDto result = goalService.updateGoal(1L, request);
+
+        assertEquals(oldHabit, goal.getHabit());
+        verify(habitRepository, never()).findById(any());
+    }
 }

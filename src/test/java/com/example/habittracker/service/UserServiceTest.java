@@ -41,6 +41,84 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
+    void updateUser_shouldUpdateOnlyUsername_whenEmailIsNull() {
+        User user = createUser(1L, "john", "john@mail.com");
+        UpdateUserRequest request = new UpdateUserRequest("johnny", null);
+        UserResponseDto dto = new UserResponseDto(1L, "johnny", "john@mail.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsername("johnny")).thenReturn(false);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDto(user)).thenReturn(dto);
+
+        UserResponseDto result = userService.updateUser(1L, request);
+
+        assertEquals(dto, result);
+        assertEquals("johnny", user.getUsername());
+        assertEquals("john@mail.com", user.getEmail());
+        verify(userRepository, never()).existsByEmail(any());
+        verify(habitSearchCache).invalidateAll();
+    }
+
+    @Test
+    void updateUser_shouldUpdateOnlyEmail_whenUsernameIsNull() {
+        User user = createUser(1L, "john", "john@mail.com");
+        UpdateUserRequest request = new UpdateUserRequest(null, "johnny@mail.com");
+        UserResponseDto dto = new UserResponseDto(1L, "john", "johnny@mail.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("johnny@mail.com")).thenReturn(false);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDto(user)).thenReturn(dto);
+
+        UserResponseDto result = userService.updateUser(1L, request);
+
+        assertEquals(dto, result);
+        assertEquals("john", user.getUsername());
+        assertEquals("johnny@mail.com", user.getEmail());
+        verify(userRepository, never()).existsByUsername(any());
+        verify(habitSearchCache).invalidateAll();
+    }
+
+    @Test
+    void updateUser_shouldNotChangeAnything_whenBothFieldsAreNull() {
+        User user = createUser(1L, "john", "john@mail.com");
+        UpdateUserRequest request = new UpdateUserRequest(null, null);
+        UserResponseDto dto = new UserResponseDto(1L, "john", "john@mail.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDto(user)).thenReturn(dto);
+
+        UserResponseDto result = userService.updateUser(1L, request);
+
+        assertEquals(dto, result);
+        assertEquals("john", user.getUsername());
+        assertEquals("john@mail.com", user.getEmail());
+        verify(userRepository, never()).existsByUsername(any());
+        verify(userRepository, never()).existsByEmail(any());
+        verify(habitSearchCache).invalidateAll();
+    }
+
+    @Test
+    void updateUser_shouldNotUpdateUsername_whenSameNameProvided() {
+        User user = createUser(1L, "john", "john@mail.com");
+        UpdateUserRequest request = new UpdateUserRequest("john", "newemail@mail.com");
+        UserResponseDto dto = new UserResponseDto(1L, "john", "newemail@mail.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail("newemail@mail.com")).thenReturn(false);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDto(user)).thenReturn(dto);
+
+        UserResponseDto result = userService.updateUser(1L, request);
+
+        assertEquals("john", user.getUsername());
+        verify(userRepository, never()).existsByUsername(any());
+        verify(userRepository).existsByEmail("newemail@mail.com");
+    }
+
+    @Test
     void createUser_shouldSaveAndInvalidateCache() {
         CreateUserRequest request = new CreateUserRequest("john", "john@mail.com");
         User user = createUser(null, "john", "john@mail.com");
