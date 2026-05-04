@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -256,7 +257,7 @@ public class HabitService {
 
         List<Habit> orderedHabits = habitIds.stream()
                 .map(habitsById::get)
-                .filter(habit -> habit != null)
+                .filter(Objects::nonNull)
                 .toList();
 
         return new PageImpl<>(orderedHabits, pageable, habitIdsPage.getTotalElements());
