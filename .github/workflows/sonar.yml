@@ -30,9 +30,6 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Make Maven wrapper executable
-        run: chmod +x mvnw
-
       - name: Build, test, coverage and Sonar scan
         shell: bash
         run: |
@@ -62,4 +59,4 @@ jobs:
             SONAR_ARGS+=("-Dsonar.organization=${SONAR_ORGANIZATION}")
           fi
 
-          ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar "${SONAR_ARGS[@]}"
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar "${SONAR_ARGS[@]}"
