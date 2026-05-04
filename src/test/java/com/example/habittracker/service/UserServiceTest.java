@@ -194,6 +194,41 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUser_shouldNotUpdateEmail_whenEmailIsNull() {
+        User user = createUser(1L, "john", "john@mail.com");
+        UpdateUserRequest request = new UpdateUserRequest("johnny", null); // email = null
+        UserResponseDto dto = new UserResponseDto(1L, "johnny", "john@mail.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsername("johnny")).thenReturn(false);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDto(user)).thenReturn(dto);
+
+        UserResponseDto result = userService.updateUser(1L, request);
+
+        assertEquals("johnny", user.getUsername());
+        assertEquals("john@mail.com", user.getEmail()); // email не изменился
+        verify(userRepository, never()).existsByEmail(any());
+    }
+
+    @Test
+    void updateUser_shouldNotUpdateEmail_whenEmailIsSame() {
+        User user = createUser(1L, "john", "john@mail.com");
+        UpdateUserRequest request = new UpdateUserRequest("johnny", "john@mail.com"); // email совпадает
+        UserResponseDto dto = new UserResponseDto(1L, "johnny", "john@mail.com");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsername("johnny")).thenReturn(false);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDto(user)).thenReturn(dto);
+
+        UserResponseDto result = userService.updateUser(1L, request);
+
+        // email не должен проверяться на существование, так как он не изменился
+        verify(userRepository, never()).existsByEmail(any());
+    }
+
+    @Test
     void getUserById_shouldThrowWhenMissing() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
