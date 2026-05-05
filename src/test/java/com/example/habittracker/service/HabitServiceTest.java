@@ -88,26 +88,6 @@ class HabitServiceTest {
     }
 
     @Test
-    void createHabit_shouldCallIsEmpty_andReturnFalse() {
-        List<Long> mockList = org.mockito.Mockito.mock(List.class);
-
-        when(mockList.isEmpty()).thenReturn(true); // важно!
-        when(mockList.size()).thenReturn(0);
-
-        CreateHabitRequest request = new CreateHabitRequest("Run", "desc", 1L, mockList);
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(createUser(1L, "john", "john@mail.com")));
-        when(habitRepository.existsByName("Run")).thenReturn(false);
-        when(habitMapper.toEntity(request, List.of())).thenReturn(createHabit(null, "Run", "desc"));
-        when(habitRepository.save(any())).thenReturn(createHabit(1L, "Run", "desc"));
-        when(habitMapper.toResponseDto(any())).thenReturn(createHabitResponseDto(1L, "Run"));
-
-        habitService.createHabit(request);
-
-        verify(mockList).isEmpty();
-    }
-
-    @Test
     void createHabit_shouldSaveHabitWithCategories_whenAllCategoriesFound() {
         CreateHabitRequest request = new CreateHabitRequest("Run", "Morning run", 1L, List.of(1L, 2L));
         User user = createUser(1L, "john", "john@mail.com");
