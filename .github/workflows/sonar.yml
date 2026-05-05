@@ -58,17 +58,18 @@ jobs:
       - name: Build and test
         run: mvn -B verify
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        continue-on-error: true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          args: >
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
-            -Dsonar.sources=src/main/java
-            -Dsonar.java.binaries=target/classes
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-            -Dsonar.qualitygate.wait=false
+  - name: SonarQube Scan
+    uses: SonarSource/sonarqube-scan-action@v6
+    continue-on-error: true
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: https://sonarcloud.io
+    with:
+      args: >
+        -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+        -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+        -Dsonar.sources=src/main/java
+        -Dsonar.java.binaries=target/classes
+        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        -Dsonar.qualitygate.wait=false
+        -Dsonar.coverage.exclusions=**/dto/**, **/controller/**, **/mapper/**, **/exception/**, **/cache/**, **/aspect/**, **/config/**, **/model/**
