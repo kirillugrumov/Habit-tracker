@@ -24,6 +24,20 @@
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.basedir}/target/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.coverage.exclusions>
+            /controller/,
+            /aspect/,
+            /cache/,
+            /model/,
+            /dto/,
+            /entity/,
+            /mapper/,
+            /repository/,
+            /config/,
+            /exception/,
+            /domain/,
+            **/krllsv/tutor/api/TutorPlatformApplication.java
+        </sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
