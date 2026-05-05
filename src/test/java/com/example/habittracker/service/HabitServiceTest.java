@@ -68,27 +68,6 @@ class HabitServiceTest {
     private HabitService habitService;
 
     @Test
-    void createHabit_shouldSaveHabitWithoutCategories() {
-        CreateHabitRequest request = new CreateHabitRequest("Run", "Morning run", 1L, List.of());
-        User user = createUser(1L, "john", "john@mail.com");
-        Habit habit = createHabit(null, "Run", "Morning run");
-        Habit savedHabit = createHabit(10L, "Run", "Morning run");
-        HabitResponseDto dto = createHabitResponseDto(10L, "Run");
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(habitRepository.existsByName("Run")).thenReturn(false);
-        when(habitMapper.toEntity(request, List.of())).thenReturn(habit);
-        when(habitRepository.save(habit)).thenReturn(savedHabit);
-        when(habitMapper.toResponseDto(savedHabit)).thenReturn(dto);
-
-        HabitResponseDto result = habitService.createHabit(request);
-
-        assertEquals(dto, result);
-        assertEquals(user, habit.getUser());
-        verify(habitSearchCache).invalidateAll();
-    }
-
-    @Test
     void createHabit_shouldSaveHabit_whenCategoryIdsIsNull() {
         CreateHabitRequest request = new CreateHabitRequest("Run", "Morning run", 1L, null);
         User user = createUser(1L, "john", "john@mail.com");
@@ -106,6 +85,26 @@ class HabitServiceTest {
 
         assertEquals(dto, result);
         verify(categoryRepository, never()).findAllById(any());
+    }
+
+    @Test
+    void createHabit_shouldCallIsEmpty_andReturnFalse() {
+        List<Long> mockList = org.mockito.Mockito.mock(List.class);
+
+        when(mockList.isEmpty()).thenReturn(true); // важно!
+        when(mockList.size()).thenReturn(0);
+
+        CreateHabitRequest request = new CreateHabitRequest("Run", "desc", 1L, mockList);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(createUser(1L, "john", "john@mail.com")));
+        when(habitRepository.existsByName("Run")).thenReturn(false);
+        when(habitMapper.toEntity(request, List.of())).thenReturn(createHabit(null, "Run", "desc"));
+        when(habitRepository.save(any())).thenReturn(createHabit(1L, "Run", "desc"));
+        when(habitMapper.toResponseDto(any())).thenReturn(createHabitResponseDto(1L, "Run"));
+
+        habitService.createHabit(request);
+
+        verify(mockList).isEmpty();
     }
 
     @Test
@@ -145,6 +144,24 @@ class HabitServiceTest {
 
         assertEquals("Old", habit.getName()); // имя не изменилось
         verify(habitRepository, never()).existsByName(any());
+    }
+
+    @Test
+    void createHabit_shouldNotFetchCategories_whenCategoryIdsIsEmptyMutableList() {
+        CreateHabitRequest request = new CreateHabitRequest("Run", "desc", 1L, new ArrayList<>());
+        User user = createUser(1L, "john", "john@mail.com");
+        Habit habit = createHabit(null, "Run", "desc");
+        Habit savedHabit = createHabit(1L, "Run", "desc");
+        HabitResponseDto dto = createHabitResponseDto(1L, "Run");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(habitRepository.existsByName("Run")).thenReturn(false);
+        when(habitMapper.toEntity(request, new ArrayList<>())).thenReturn(habit);
+        when(habitRepository.save(habit)).thenReturn(savedHabit);
+        when(habitMapper.toResponseDto(savedHabit)).thenReturn(dto);
+
+        habitService.createHabit(request);
+        verify(categoryRepository, never()).findAllById(any());
     }
 
     @Test

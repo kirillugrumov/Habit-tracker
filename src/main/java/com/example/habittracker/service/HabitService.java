@@ -63,10 +63,16 @@ public class HabitService {
         }
 
         List<Category> categories = new ArrayList<>();
-        if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
-            categories = categoryRepository.findAllById(request.getCategoryIds());
-            if (categories.size() != request.getCategoryIds().size()) {
-                throw new EntityNotFoundException("Some categories were not found");
+        List<Long> categoryIds;
+        categoryIds = request.getCategoryIds();
+
+        if (categoryIds != null) {
+            if (!categoryIds.isEmpty()) {
+                categories = categoryRepository.findAllById(categoryIds);
+
+                if (categories.size() != categoryIds.size()) {
+                    throw new EntityNotFoundException("Some categories were not found");
+                }
             }
         }
 
