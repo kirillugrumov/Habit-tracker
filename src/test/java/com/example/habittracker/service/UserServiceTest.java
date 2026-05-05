@@ -241,6 +241,25 @@ class UserServiceTest {
     }
 
     @Test
+    void updateUser_shouldThrowWhenUserNotFound() {
+        Long id = 999L;
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+        UpdateUserRequest request = new UpdateUserRequest("name", "email@mail.com");
+        assertThrows(EntityNotFoundException.class, () -> userService.updateUser(id, request));
+    }
+
+    @Test
+    void getUserById_shouldThrowWhenUserNotFound() {
+        Long id = 999L;
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> userService.getUserById(id)
+        );
+        assertEquals("User not found with id: " + id, exception.getMessage());
+    }
+
+    @Test
     void updateUser_shouldUpdateUsernameAndEmailAndInvalidateCache() {
         User user = createUser(1L, "john", "john@mail.com");
         UpdateUserRequest request = new UpdateUserRequest("johnny", "johnny@mail.com");
