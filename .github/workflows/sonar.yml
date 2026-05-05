@@ -34,5 +34,5 @@ jobs:
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.token=${SONAR_TOKEN} \
             -Dsonar.coverage.exclusions=src/main/java/com/example/habittracker/controller/**,src/main/java/com/example/habittracker/dto/**,src/main/java/com/example/habittracker/mapper/**,src/main/java/com/example/habittracker/exception/**,src/main/java/com/example/habittracker/cache/**,src/main/java/com/example/habittracker/aspect/**,src/main/java/com/example/habittracker/config/**,src/main/java/com/example/habittracker/model/**
