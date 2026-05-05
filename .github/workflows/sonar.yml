@@ -1,72 +1,38 @@
-name: Build and Sonar
-
-on:
-  push:
-  pull_request:
-
+name: Build and Sonar Analysis
+on: [push, pull_request]
 jobs:
   sonar:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: read
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Java
-        uses: actions/setup-java@v5
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          distribution: temurin
           java-version: 17
+          distribution: 'temurin'
           cache: maven
 
-      - name: Cache Sonar packages
+      - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Validate Sonar configuration
-        shell: bash
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
-          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
-        run: |
-          set -euo pipefail
-
-          if [ -z "${SONAR_TOKEN:-}" ]; then
-            echo "SONAR_TOKEN secret is not configured"
-            exit 1
-          fi
-
-          if [ -z "${SONAR_PROJECT_KEY:-}" ]; then
-            echo "SONAR_PROJECT_KEY repository variable is not configured"
-            exit 1
-          fi
-
-          if [ -z "${SONAR_ORGANIZATION:-}" ]; then
-            echo "SONAR_ORGANIZATION repository variable is required for SonarCloud"
-            exit 1
-          fi
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        continue-on-error: true
+      - name: Build, test and analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          args: >
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
-            -Dsonar.sources=src/main/java
-            -Dsonar.java.binaries=target/classes
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-            -Dsonar.qualitygate.wait=false
-            -Dsonar.coverage.exclusions=src/main/java/com/example/habittracker/aspect/**,src/main/java/com/example/habittracker/cache/**,src/main/java/com/example/habittracker/controller/**,src/main/java/com/example/habittracker/domain/**,src/main/java/com/example/habittracker/dto/**,src/main/java/com/example/habittracker/exception/**,src/main/java/com/example/habittracker/mapper/**,src/main/java/com/example/habittracker/repository/**
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.coverage.exclusions=src/main/java/com/example/habittracker/controller/**,src/main/java/com/example/habittracker/dto/**,src/main/java/com/example/habittracker/mapper/**,src/main/java/com/example/habittracker/exception/**,src/main/java/com/example/habittracker/cache/**,src/main/java/com/example/habittracker/aspect/**,src/main/java/com/example/habittracker/config/**,src/main/java/com/example/habittracker/model/**
