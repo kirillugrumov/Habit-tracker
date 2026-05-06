@@ -20,35 +20,30 @@ public class RaceConditionDemoService {
         int safeTrials = Math.max(trials, 3);
 
         List<RaceDemoResult> results = new ArrayList<>();
-        results.add(runOnce("unsafe", safeThreads, safeTasks, new UnsafeCounter()));
+        results.add(runUnsafeBestEffort(safeThreads, safeTasks, safeTrials));
         results.add(runOnce("synchronized", safeThreads, safeTasks, new SynchronizedCounter()));
         results.add(runOnce("atomic", safeThreads, safeTasks, new AtomicCounter()));
+        return results;
+    }
 
-        // Make race visible even if first run "got lucky"
-        if (results.get(0).ok()) {
-            RaceDemoResult bestEffort = null;
-            for (int i = 0; i < safeTrials; i++) {
-                RaceDemoResult attempt = runOnce("unsafe(trial " + (i + 1) + ")", safeThreads, safeTasks, new UnsafeCounter());
-                bestEffort = attempt;
-                results.add(attempt);
-                if (!attempt.ok()) {
-                    break;
-                }
+    private RaceDemoResult runUnsafeBestEffort(int threads, int tasks, int trials) {
+        RaceDemoResult bestAttempt = runOnce("unsafe", threads, tasks, new UnsafeCounter());
+        long maxLostUpdates = bestAttempt.expected() - bestAttempt.actual();
+
+        for (int i = 1; i < trials; i++) {
+            RaceDemoResult attempt = runOnce("unsafe", threads, tasks, new UnsafeCounter());
+            long lostUpdates = attempt.expected() - attempt.actual();
+            if (lostUpdates > maxLostUpdates) {
+                bestAttempt = attempt;
+                maxLostUpdates = lostUpdates;
             }
-            if (bestEffort != null && bestEffort.ok()) {
-                results.add(new RaceDemoResult(
-                        "note",
-                        safeThreads,
-                        safeTasks,
-                        safeTasks,
-                        safeTasks,
-                        true,
-                        0
-                ));
+            if (!attempt.ok()) {
+                bestAttempt = attempt;
+                break;
             }
         }
 
-        return results;
+        return bestAttempt;
     }
 
     private RaceDemoResult runOnce(String mode, int threads, int tasks, Counter counter) {

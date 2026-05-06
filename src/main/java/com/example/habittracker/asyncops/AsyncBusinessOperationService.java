@@ -1,49 +1,29 @@
 package com.example.habittracker.asyncops;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class AsyncBusinessOperationService {
 
+    private final AtomicLong taskSequence = new AtomicLong(0L);
     private final AsyncTaskRegistry registry;
+    private final AsyncBusinessOperationExecutor executor;
 
-    public AsyncBusinessOperationService(AsyncTaskRegistry registry) {
+    public AsyncBusinessOperationService(AsyncTaskRegistry registry, AsyncBusinessOperationExecutor executor) {
         this.registry = registry;
+        this.executor = executor;
     }
 
     public StartAsyncOperationResponse start(StartAsyncOperationRequest request) {
-        String taskId = UUID.randomUUID().toString();
+        String taskId = String.valueOf(taskSequence.incrementAndGet());
         registry.create(taskId);
-        executeAsync(taskId, request);
+        executor.executeAsync(taskId, request);
         return new StartAsyncOperationResponse(taskId);
     }
 
     public AsyncTaskSnapshot status(String taskId) {
         return registry.getRequired(taskId);
-    }
-
-    @Async("businessExecutor")
-    public CompletableFuture<Void> executeAsync(String taskId, StartAsyncOperationRequest request) {
-        registry.markRunning(taskId);
-        try {
-            long sum = 0L;
-            int iterations = request.iterations();
-            int delayMs = request.delayMs();
-            for (int i = 0; i < iterations; i++) {
-                sum += (i % 10);
-                if (delayMs > 0 && i % 10_000 == 0) {
-                    Thread.sleep(delayMs);
-                }
-            }
-            registry.markSuccess(taskId, sum);
-            return CompletableFuture.completedFuture(null);
-        } catch (Throwable ex) {
-            registry.markFailed(taskId, ex);
-            return CompletableFuture.failedFuture(ex);
-        }
     }
 }

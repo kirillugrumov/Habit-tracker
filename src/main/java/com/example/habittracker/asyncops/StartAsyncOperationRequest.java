@@ -5,6 +5,6 @@ import jakarta.validation.constraints.Min;
 
 public record StartAsyncOperationRequest(
         @Min(1) @Max(2_000_000) int iterations,
-        @Min(0) @Max(50) int delayMs
+        @Min(0) @Max(30) int delaySeconds
 ) {
 }
