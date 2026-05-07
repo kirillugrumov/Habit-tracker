@@ -24,7 +24,7 @@ class AsyncBusinessOperationServiceTest {
     private AsyncBusinessOperationService service;
 
     @Test
-    void startReturnsTaskIdAndCompletesInBackground() throws Exception {
+    void startReturnsTaskIdAndCompletesInBackground() {
         StartAsyncOperationResponse response = service.start(new StartAsyncOperationRequest(50_000, 1));
         assertNotNull(response.taskId());
         assertTrue(response.taskId().matches("\\d+"));
