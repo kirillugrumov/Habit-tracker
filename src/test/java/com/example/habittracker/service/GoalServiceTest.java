@@ -226,7 +226,7 @@ class GoalServiceTest {
         when(goalRepository.save(goal)).thenReturn(goal);
         when(goalMapper.toResponseDto(goal)).thenReturn(dto);
 
-        GoalResponseDto result = goalService.updateGoal(1L, request);
+        goalService.updateGoal(1L, request);
 
         assertEquals("OldGoal", goal.getName());
         assertEquals("NewCondition", goal.getCondition());
@@ -244,7 +244,7 @@ class GoalServiceTest {
         when(goalRepository.save(goal)).thenReturn(goal);
         when(goalMapper.toResponseDto(goal)).thenReturn(dto);
 
-        GoalResponseDto result = goalService.updateGoal(1L, request);
+        goalService.updateGoal(1L, request);
 
         assertEquals("SameGoal", goal.getName());
         verify(goalRepository, never()).existsByName(any());
@@ -261,7 +261,7 @@ class GoalServiceTest {
         when(goalRepository.save(goal)).thenReturn(goal);
         when(goalMapper.toResponseDto(goal)).thenReturn(dto);
 
-        GoalResponseDto result = goalService.updateGoal(1L, request);
+        goalService.updateGoal(1L, request);
 
         assertEquals("OldCondition", goal.getCondition());
         assertEquals("NewName", goal.getName());

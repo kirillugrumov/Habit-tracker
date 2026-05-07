@@ -208,7 +208,7 @@ class CategoryServiceTest {
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toResponseDto(category)).thenReturn(dto);
 
-        CategoryResponseDto result = categoryService.updateCategory(1L, request);
+        categoryService.updateCategory(1L, request);
 
         assertEquals("Health", category.getName()); // имя не изменилось
         assertEquals("new desc", category.getDescription());
@@ -226,7 +226,7 @@ class CategoryServiceTest {
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toResponseDto(category)).thenReturn(dto);
 
-        CategoryResponseDto result = categoryService.updateCategory(1L, request);
+        categoryService.updateCategory(1L, request);
 
         assertEquals("Health", category.getName());
         // проверка существования не должна вызываться

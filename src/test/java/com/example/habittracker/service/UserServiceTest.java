@@ -111,7 +111,7 @@ class UserServiceTest {
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponseDto(user)).thenReturn(dto);
 
-        UserResponseDto result = userService.updateUser(1L, request);
+        userService.updateUser(1L, request);
 
         assertEquals("john", user.getUsername());
         verify(userRepository, never()).existsByUsername(any());

@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,7 +39,7 @@ class AsyncBusinessOperationServiceTest {
             if (snapshot.status() == AsyncTaskStatus.SUCCESS || snapshot.status() == AsyncTaskStatus.FAILED) {
                 break;
             }
-            Thread.sleep(50);
+            LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(50));
         }
 
         assertEquals(AsyncTaskStatus.SUCCESS, snapshot.status());
