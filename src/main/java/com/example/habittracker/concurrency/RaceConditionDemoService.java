@@ -62,7 +62,10 @@ public class RaceConditionDemoService {
             pool.submit(() -> {
                 ready.countDown();
                 try {
-                    start.await(5, TimeUnit.SECONDS);
+                    boolean startedOnTime = start.await(5, TimeUnit.SECONDS);
+                    if (!startedOnTime) {
+                        return;
+                    }
                     for (int i = 0; i < increments; i++) {
                         counter.incrementAndGet();
                     }
@@ -75,11 +78,18 @@ public class RaceConditionDemoService {
         }
 
         try {
-            ready.await(5, TimeUnit.SECONDS);
+            boolean readyOnTime = ready.await(5, TimeUnit.SECONDS);
+            if (!readyOnTime) {
+                return buildIncompleteResult(mode, threads, tasks, counter, started);
+            }
             start.countDown();
-            done.await(30, TimeUnit.SECONDS);
+            boolean completedOnTime = done.await(30, TimeUnit.SECONDS);
+            if (!completedOnTime) {
+                return buildIncompleteResult(mode, threads, tasks, counter, started);
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return buildIncompleteResult(mode, threads, tasks, counter, started);
         } finally {
             pool.shutdownNow();
         }
@@ -90,5 +100,10 @@ public class RaceConditionDemoService {
         long elapsedMs = Duration.between(started, Instant.now()).toMillis();
 
         return new RaceDemoResult(mode, threads, tasks, expected, actual, ok, elapsedMs);
+    }
+
+    private RaceDemoResult buildIncompleteResult(String mode, int threads, int tasks, Counter counter, Instant started) {
+        long elapsedMs = Duration.between(started, Instant.now()).toMillis();
+        return new RaceDemoResult(mode, threads, tasks, tasks, counter.get(), false, elapsedMs);
     }
 }

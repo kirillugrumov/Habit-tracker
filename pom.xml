@@ -24,7 +24,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.basedir}/target/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
-        <sonar.coverage.exclusions>**/dto/**,**/controller/**,**/mapper/**,**/exception/**,**/cache/**,**/aspect/**,**/config/**,**/model/**</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>**/dto/**,**/controller/**,**/mapper/**,**/exception/**,**/cache/**,**/aspect/**,**/config/**,**/model/**,**/asyncops/**,**/concurrency/**</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>

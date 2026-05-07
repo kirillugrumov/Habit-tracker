@@ -29,7 +29,11 @@ public class AsyncBusinessOperationExecutor {
             }
             registry.markSuccess(taskId, sum);
             return CompletableFuture.completedFuture(null);
-        } catch (Throwable ex) {
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            registry.markFailed(taskId, ex);
+            return CompletableFuture.failedFuture(ex);
+        } catch (Exception ex) {
             registry.markFailed(taskId, ex);
             return CompletableFuture.failedFuture(ex);
         }
