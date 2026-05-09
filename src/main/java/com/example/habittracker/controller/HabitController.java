@@ -133,7 +133,8 @@ public class HabitController {
     }
 
     @GetMapping("/search/jpql")
-    @Operation(summary = "Search habits via JPQL", description = "Searches habits by username and category using JPQL.")
+    @Operation(summary = "Search habits via JPQL",
+            description = "Searches habits by username, category, and habit name (partial, case-insensitive) using JPQL.")
             @ApiResponse(responseCode = "200", description = "Search result returned successfully")
         @ApiResponse(responseCode = "400", description = "Bad request parameters",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
@@ -142,18 +143,20 @@ public class HabitController {
     public ResponseEntity<Page<HabitResponseDto>> searchHabitsJpql(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String habitName,
             Pageable pageable) {
         Page<HabitResponseDto> habits = habitService.searchHabitsByUserAndCategoryJpql(
                 username,
                 categoryName,
+                habitName,
                 pageable
         );
         return ResponseEntity.ok(habits);
     }
 
     @GetMapping("/search/native")
-    @Operation(summary = "Search habits via native SQL", description = "Searches habits by username and category " +
-            "using a native query.")
+    @Operation(summary = "Search habits via native SQL",
+            description = "Searches habits by username, category, and habit name using a native SQL query.")
             @ApiResponse(responseCode = "200", description = "Search result returned successfully")
         @ApiResponse(responseCode = "400", description = "Bad request parameters",
                     content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
@@ -162,10 +165,12 @@ public class HabitController {
     public ResponseEntity<Page<HabitResponseDto>> searchHabitsNative(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String habitName,
             Pageable pageable) {
         Page<HabitResponseDto> habits = habitService.searchHabitsByUserAndCategoryNative(
                 username,
                 categoryName,
+                habitName,
                 pageable
         );
         return ResponseEntity.ok(habits);

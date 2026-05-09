@@ -160,16 +160,18 @@ public class HabitService {
     public Page<HabitResponseDto> searchHabitsByUserAndCategoryJpql(
             String username,
             String categoryName,
+            String habitName,
             Pageable pageable) {
-        return searchHabits(username, categoryName, pageable, HabitSearchQueryType.JPQL);
+        return searchHabits(username, categoryName, habitName, pageable, HabitSearchQueryType.JPQL);
     }
 
     @Transactional(readOnly = true)
     public Page<HabitResponseDto> searchHabitsByUserAndCategoryNative(
             String username,
             String categoryName,
+            String habitName,
             Pageable pageable) {
-        return searchHabits(username, categoryName, pageable, HabitSearchQueryType.NATIVE);
+        return searchHabits(username, categoryName, habitName, pageable, HabitSearchQueryType.NATIVE);
     }
 
     public UserWithHabitResponseDto saveUserAndHabitWithoutTransaction(
@@ -198,14 +200,17 @@ public class HabitService {
 
     private Page<HabitResponseDto> searchHabits(String username,
                                                 String categoryName,
+                                                String habitName,
                                                 Pageable pageable,
                                                 HabitSearchQueryType queryType) {
         String normalizedUsername = normalizeFilter(username);
         String normalizedCategoryName = normalizeFilter(categoryName);
+        String normalizedHabitName = normalizeFilter(habitName);
         HabitSearchCacheKey cacheKey = new HabitSearchCacheKey(
                 queryType,
                 normalizedUsername,
                 normalizedCategoryName,
+                normalizedHabitName,
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
                 pageable.getSort().toString()
@@ -217,8 +222,10 @@ public class HabitService {
         }
 
         Page<Habit> habitsPage = queryType == HabitSearchQueryType.JPQL
-                ? findHabitsPageWithoutNPlusOne(normalizedUsername, normalizedCategoryName, pageable)
-                : habitRepository.searchByUserAndCategoryNative(normalizedUsername, normalizedCategoryName, pageable);
+                ? findHabitsPageWithoutNPlusOne(
+                        normalizedUsername, normalizedCategoryName, normalizedHabitName, pageable)
+                : habitRepository.searchByUserAndCategoryNative(
+                        normalizedUsername, normalizedCategoryName, normalizedHabitName, pageable);
 
         Page<HabitResponseDto> responsePage = habitsPage.map(habitMapper::toResponseDto);
         habitSearchCache.put(cacheKey, responsePage);
@@ -239,10 +246,12 @@ public class HabitService {
 
     private Page<Habit> findHabitsPageWithoutNPlusOne(String username,
                                                       String categoryName,
+                                                      String habitName,
                                                       Pageable pageable) {
         Page<Long> habitIdsPage = habitRepository.findHabitIdsByUserAndCategoryJpql(
                 username,
                 categoryName,
+                habitName,
                 pageable
         );
 

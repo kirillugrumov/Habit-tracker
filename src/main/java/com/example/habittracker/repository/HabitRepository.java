@@ -28,6 +28,7 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
                     LEFT JOIN h.categories c
                     WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))
                       AND LOWER(COALESCE(c.name, '')) LIKE LOWER(CONCAT('%', :categoryName, '%'))
+                      AND LOWER(h.name) LIKE LOWER(CONCAT('%', :habitName, '%'))
                     """,
             countQuery = """
                     SELECT COUNT(DISTINCT h)
@@ -36,10 +37,12 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
                     LEFT JOIN h.categories c
                     WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))
                       AND LOWER(COALESCE(c.name, '')) LIKE LOWER(CONCAT('%', :categoryName, '%'))
+                      AND LOWER(h.name) LIKE LOWER(CONCAT('%', :habitName, '%'))
                     """
     )
     Page<Long> findHabitIdsByUserAndCategoryJpql(@Param("username") String username,
                                                  @Param("categoryName") String categoryName,
+                                                 @Param("habitName") String habitName,
                                                  Pageable pageable);
 
     @Query("""
@@ -60,6 +63,7 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
                     LEFT JOIN categories c ON c.id = hc.category_id
                     WHERE u.username ILIKE CONCAT('%', :username, '%')
                       AND COALESCE(c.name, '') ILIKE CONCAT('%', :categoryName, '%')
+                      AND h.name ILIKE CONCAT('%', :habitName, '%')
                     """,
             countQuery = """
                     SELECT COUNT(DISTINCT h.id)
@@ -69,10 +73,12 @@ public interface HabitRepository extends JpaRepository<Habit, Long> {
                     LEFT JOIN categories c ON c.id = hc.category_id
                     WHERE u.username ILIKE CONCAT('%', :username, '%')
                       AND COALESCE(c.name, '') ILIKE CONCAT('%', :categoryName, '%')
+                      AND h.name ILIKE CONCAT('%', :habitName, '%')
                     """,
             nativeQuery = true
     )
     Page<Habit> searchByUserAndCategoryNative(@Param("username") String username,
                                               @Param("categoryName") String categoryName,
+                                              @Param("habitName") String habitName,
                                               Pageable pageable);
 }

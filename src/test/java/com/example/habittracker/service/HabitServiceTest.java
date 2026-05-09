@@ -218,11 +218,11 @@ class HabitServiceTest {
         HabitResponseDto dto2 = createHabitResponseDto(2L, "Read");
 
         when(habitSearchCache.get(any(HabitSearchCacheKey.class))).thenReturn(null);
-        when(habitRepository.findHabitIdsByUserAndCategoryJpql("john", "health", pageable)).thenReturn(idsPage);
+        when(habitRepository.findHabitIdsByUserAndCategoryJpql("john", "health", "", pageable)).thenReturn(idsPage);
         when(habitRepository.findAllWithUserAndCategoriesByIdIn(List.of(1L, 2L))).thenReturn(fetchedHabits);
         when(habitMapper.toResponseDto(habit2)).thenReturn(dto2);
 
-        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql("john", "health", pageable);
+        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql("john", "health", "", pageable);
 
         assertEquals(1, result.getContent().size());
         assertEquals(2L, result.getContent().get(0).getId());
@@ -437,10 +437,11 @@ class HabitServiceTest {
 
         when(habitSearchCache.get(any(HabitSearchCacheKey.class))).thenReturn(cachedPage);
 
-        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql(" john ", " health ", pageable);
+        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql(
+                " john ", " health ", null, pageable);
 
         assertEquals(cachedPage, result);
-        verify(habitRepository, never()).findHabitIdsByUserAndCategoryJpql(any(), any(), any());
+        verify(habitRepository, never()).findHabitIdsByUserAndCategoryJpql(any(), any(), any(), any());
     }
 
     @Test
@@ -449,9 +450,9 @@ class HabitServiceTest {
         Page<Long> emptyIdsPage = new PageImpl<>(List.of(), pageable, 0);
 
         when(habitSearchCache.get(any(HabitSearchCacheKey.class))).thenReturn(null);
-        when(habitRepository.findHabitIdsByUserAndCategoryJpql("", "", pageable)).thenReturn(emptyIdsPage);
+        when(habitRepository.findHabitIdsByUserAndCategoryJpql("", "", "", pageable)).thenReturn(emptyIdsPage);
 
-        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql(null, null, pageable);
+        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql(null, null, null, pageable);
 
         assertNotNull(result);
         assertEquals(0, result.getTotalElements());
@@ -468,12 +469,12 @@ class HabitServiceTest {
         HabitResponseDto secondDto = createHabitResponseDto(2L, "Read");
 
         when(habitSearchCache.get(any(HabitSearchCacheKey.class))).thenReturn(null);
-        when(habitRepository.findHabitIdsByUserAndCategoryJpql("john", "health", pageable)).thenReturn(idsPage);
+        when(habitRepository.findHabitIdsByUserAndCategoryJpql("john", "health", "", pageable)).thenReturn(idsPage);
         when(habitRepository.findAllWithUserAndCategoriesByIdIn(List.of(2L, 1L))).thenReturn(List.of(firstFetched, secondFetched));
         when(habitMapper.toResponseDto(secondFetched)).thenReturn(secondDto);
         when(habitMapper.toResponseDto(firstFetched)).thenReturn(firstDto);
 
-        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql("john", "health", pageable);
+        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryJpql("john", "health", "", pageable);
 
         assertEquals(List.of(secondDto, firstDto), result.getContent());
         verify(habitSearchCache).put(any(HabitSearchCacheKey.class), eq(result));
@@ -487,10 +488,11 @@ class HabitServiceTest {
         HabitResponseDto dto = createHabitResponseDto(1L, "Run");
 
         when(habitSearchCache.get(any(HabitSearchCacheKey.class))).thenReturn(null);
-        when(habitRepository.searchByUserAndCategoryNative("john", "health", pageable)).thenReturn(habitsPage);
+        when(habitRepository.searchByUserAndCategoryNative("john", "health", "", pageable)).thenReturn(habitsPage);
         when(habitMapper.toResponseDto(habit)).thenReturn(dto);
 
-        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryNative(" john ", " health ", pageable);
+        Page<HabitResponseDto> result = habitService.searchHabitsByUserAndCategoryNative(
+                " john ", " health ", null, pageable);
 
         assertEquals(List.of(dto), result.getContent());
         verify(habitSearchCache).put(any(HabitSearchCacheKey.class), eq(result));
