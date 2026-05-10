@@ -26,14 +26,14 @@ body {
     color: var(--text-primary);
     background-color: #0a1410;
     background-image:
-        linear-gradient(
+    linear-gradient(
             155deg,
-            rgba(11, 28, 20, 0.9) 0%,
-            rgba(12, 32, 22, 0.78) 38%,
-            rgba(22, 48, 32, 0.65) 100%
-        ),
-        linear-gradient(to bottom, rgba(5, 12, 9, 0.35), rgba(5, 14, 10, 0.55)),
-        url("/media/forest-bg.jpg");
+            rgba(11, 28, 20, 0.5) 0%,
+            rgba(12, 32, 22, 0.4) 38%,
+            rgba(22, 48, 32, 0.3) 100%
+    ),
+    linear-gradient(to bottom, rgba(5, 12, 9, 0.2), rgba(5, 14, 10, 0.25)),
+    url("/media/forest-bg.jpg");
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -58,25 +58,33 @@ button:disabled {
 }
 
 .app-shell {
-    display: grid;
-    grid-template-columns: 266px 1fr;
     min-height: 100vh;
 }
 
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 266px;
+    height: 100vh;
+
+    overflow-y: auto;
+
     padding: 30px 20px;
     border-right: 1px solid var(--glass-border);
+
     background: var(--glass-bg);
     color: var(--text-primary);
+
     backdrop-filter: blur(22px) saturate(140%);
     -webkit-backdrop-filter: blur(22px) saturate(140%);
+
+    z-index: 100;
 }
 
 .sidebar-brand {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    margin-bottom: 28px;
+    margin-bottom: 34px;
 }
 
 .sidebar-mark {
@@ -138,7 +146,13 @@ button:disabled {
 }
 
 .main-view {
-    padding: 34px 36px 48px;
+    margin-left: 266px;
+
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
     position: relative;
 }
 
@@ -374,6 +388,10 @@ button:disabled {
     align-items: flex-start;
 }
 
+.habits-search-panel .panel-heading {
+    margin-bottom: 18px;
+}
+
 .panel-heading h3,
 .entity-card-body h3,
 .entity-card h3 {
@@ -566,6 +584,7 @@ button:disabled {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-top: 22px;
 }
 
 .habits-browse > .entity-grid {
@@ -841,8 +860,16 @@ button:disabled {
     }
 
     .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+
         border-right: 0;
         border-bottom: 1px solid var(--glass-border);
+    }
+
+    .main-view {
+        margin-left: 0;
     }
 
     .topbar {
@@ -870,4 +897,80 @@ button:disabled {
     .entity-card-actions {
         grid-template-columns: 1fr;
     }
+}
+
+.app-footer {
+    margin-top: auto;
+
+    width: 100%;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    background:
+            linear-gradient(
+                    180deg,
+                    rgba(10, 24, 18, 0.72),
+                    rgba(6, 16, 12, 0.92)
+            );
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.footer-content {
+    padding: 28px 36px 34px;
+
+    color: var(--text-muted);
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.footer-content p {
+    margin: 0;
+
+    max-width: 900px;
+
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+.footer-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    font-size: 13px;
+}
+
+.footer-meta a {
+    color: var(--accent-lime);
+
+    text-decoration: none;
+
+    transition: opacity 0.18s ease;
+}
+
+.footer-meta a:hover {
+    opacity: 0.8;
+}
+
+@media (max-width: 640px) {
+    .footer-content {
+        padding: 24px 18px 28px;
+    }
+
+    .footer-meta {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+.main-content {
+    flex: 1;
+
+    padding: 34px 36px 48px;
 }

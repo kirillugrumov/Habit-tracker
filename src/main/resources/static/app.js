@@ -635,7 +635,6 @@ function renderApp() {
         <div class="app-shell">
             <aside class="sidebar">
                 <div class="sidebar-brand">
-                    <div class="sidebar-mark">HT</div>
                     <div>
                         <h1>Habit Tracker</h1>
                         <p>Glass daily flow — stay on streak.</p>
@@ -650,6 +649,7 @@ function renderApp() {
                 </nav>
             </aside>
             <main class="main-view">
+            <div class="main-content">
                 <header class="topbar">
                     <div>
                         <h2>${getPageTitle()}</h2>
@@ -659,8 +659,30 @@ function renderApp() {
                         ${renderPrimaryAction()}
                     </div>
                 </header>
+               
                 ${state.status.message ? `<div class="flash ${state.status.type}">${escapeHtml(state.status.message)}</div>` : ""}
                 ${state.loading ? `<section class="panel"><p>Loading...</p></section>` : renderCurrentTab()}
+                </div>
+                <footer class="app-footer">
+        
+    <div class="footer-content">
+        <p>
+            Habit-Tracker — это учебное Spring Boot приложение,
+            представляющее собой REST API для отслеживания привычек.
+            Финальной целью является создание полноценного backend-сервиса
+            с подключением к базе данных, реализующего операции выбора,
+            кастомизации привычек и ведения статистики выполнения.
+        </p>
+
+        <div class="footer-meta">
+            <span>Built with Spring Boot</span>
+            <span>•</span>
+            <a href="mailto:kirillxxxoio@gmail.com">
+                kirillxxxoio@gmail.com
+            </a>
+        </div>
+    </div>
+</footer>
             </main>
             ${renderModal()}
         </div>
