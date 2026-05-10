@@ -25,7 +25,8 @@ const state = {
         selectedDate: null, // формат YYYY-MM-DD
         currentYear: null,
         currentMonth: null  // 0-11
-    }
+    },
+    mobileMenuOpen: false
 };
 
 const tabs = [
@@ -45,6 +46,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderApp();
     await loadAllData();
 });
+
+function openMobileMenu() {
+    state.mobileMenuOpen = true;
+    renderApp();
+}
+
+function closeMobileMenu() {
+    state.mobileMenuOpen = false;
+    renderApp();
+}
 
 function escapeHtml(value) {
     return String(value ?? "")
@@ -646,8 +657,14 @@ async function changeSearchPage(delta) {
 function renderApp() {
     app.innerHTML = `
         <div class="app-shell">
-            <aside class="sidebar">
+        <button class="mobile-menu-toggle" data-open-mobile-menu>
+    ☰
+</button>
+            <aside class="sidebar ${state.mobileMenuOpen ? "sidebar--open" : ""}">
                 <div class="sidebar-brand">
+                <button class="sidebar-close" data-close-mobile-menu>
+                 ✕
+                </button>
                     <div>
                         <h1>Habit Tracker</h1>
                         <p>Glass daily flow — stay on streak.</p>
@@ -661,6 +678,7 @@ function renderApp() {
                     `).join("")}
                 </nav>
             </aside>
+            ${state.mobileMenuOpen ? `<div class="sidebar-backdrop" data-close-mobile-menu></div>` : ""}
             <main class="main-view">
             <div class="main-content">
                 <header class="topbar">
@@ -675,7 +693,7 @@ function renderApp() {
                
                 ${state.status.message ? `<div class="flash ${state.status.type}">${escapeHtml(state.status.message)}</div>` : ""}
                 ${state.loading ? `<section class="panel"><p>Loading...</p></section>` : renderCurrentTab()}
-                </div>
+            </div>
                 <footer class="app-footer">
         
     <div class="footer-content">
@@ -1206,6 +1224,16 @@ function renderModalForm(entity) {
 }
 
 function bindAppEvents() {
+    document.querySelector("[data-open-mobile-menu]")?.addEventListener("click", () => {
+        openMobileMenu();
+    });
+
+    document.querySelectorAll("[data-close-mobile-menu]").forEach((el) => {
+        el.addEventListener("click", () => {
+            closeMobileMenu();
+        });
+    });
+
     document.querySelectorAll("[data-tab]").forEach((button) => {
         button.addEventListener("click", () => toggleTab(button.dataset.tab));
     });

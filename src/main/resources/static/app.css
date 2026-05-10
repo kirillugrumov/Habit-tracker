@@ -19,6 +19,18 @@
     box-sizing: border-box;
 }
 
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.mobile-menu-toggle,
+.sidebar-close {
+    display: none;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
@@ -869,16 +881,123 @@ button:disabled {
     }
 
     .main-view {
+        width: 100%;
         margin-left: 0;
+        padding: 0;
     }
 
     .topbar {
         flex-direction: column;
     }
+
+    .app-footer {
+        width: 100%;
+        margin-left: 0;
+        border-radius: 0;
+        box-sizing: border-box;
+    }
+
+    .footer-content {
+        width: 100%;
+        padding-left: 18px;
+        padding-right: 18px;
+        box-sizing: border-box;
+    }
+
+    .mobile-menu-toggle {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        border: 1px solid rgba(255,255,255,0.08);
+
+        background: rgba(12, 24, 18, 0.72);
+
+        color: var(--text-primary);
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+
+        z-index: 300;
+
+        font-size: 20px;
+    }
+
+    .sidebar {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 270px;
+        height: 100vh;
+
+        transform: translateX(-100%);
+
+        transition: transform 0.28s ease;
+
+        z-index: 400;
+    }
+
+    .sidebar.sidebar--open {
+        transform: translateX(0);
+    }
+
+    .sidebar-close {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: transparent;
+
+        color: var(--text-muted);
+
+        font-size: 18px;
+    }
+
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+
+        background: rgba(0,0,0,0.35);
+
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+
+        z-index: 250;
+    }
+
+    .main-content {
+        padding-top: 74px;
+    }
 }
 
 @media (max-width: 640px) {
     .main-view {
+        padding: 0;
+    }
+
+    .main-content {
         padding: 22px 18px 36px;
     }
 
@@ -1068,3 +1187,4 @@ button:disabled {
     margin: 0 auto;
     padding: 20px 24px;
 }
+
