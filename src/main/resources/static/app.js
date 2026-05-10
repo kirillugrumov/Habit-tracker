@@ -1491,10 +1491,24 @@ function getLast7DaysData() {
 }
 
 function renderStatsWidget() {
-    const stats = getCurrentMonthStats();
+    const stats = getCurrentMonthStats();       // fullDaysCount, totalCompletedHabits, maxStreak, daysInMonth
     const currentStreak = getCurrentStreak();
     const last7 = getLast7DaysData();
-    const maxBarHeight = 32; // высота столбца в пикселях (уменьшили для минимализма)
+    const maxBarHeight = 32;
+
+    // Доп. показатель: процент дней с выполнением хотя бы одной привычки
+    let daysWithAnyCompletion = 0;
+    const year = state.calendar.currentYear;
+    const month = state.calendar.currentMonth;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const statsDay = getDayStats(dateStr);
+        if (statsDay.totalCount > 0 && statsDay.completedCount > 0) {
+            daysWithAnyCompletion++;
+        }
+    }
+    const productivityPercent = Math.round((daysWithAnyCompletion / daysInMonth) * 100);
 
     let barsHtml = '';
     for (let i = 0; i < last7.length; i++) {
@@ -1512,19 +1526,24 @@ function renderStatsWidget() {
     return `
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Current streak</div>
+                <div class="stat-label">Current streak (this month)</div>
                 <div class="stat-value">${currentStreak}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Best streak (month)</div>
+                <div class="stat-label">Best streak (this month)</div>
                 <div class="stat-value">${stats.maxStreak}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total completions</div>
+                <div class="stat-label">Total completions (this month)</div>
                 <div class="stat-value">${stats.totalCompletedHabits}</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">Productivity score</div>
+                <div class="stat-value">${productivityPercent}%</div>
+                <div class="stat-sub">days with any habit done</div>
+            </div>
             <div class="stat-card chart-card">
-                <div class="stat-label">Last 7 days</div>
+                <div class="stat-label">Weekly progress (last 7 days)</div>
                 <div class="chart-container">
                     <div class="chart-bars">${barsHtml}</div>
                 </div>
@@ -1565,3 +1584,5 @@ function getCurrentMonthStats() {
 
     return { fullDaysCount, totalCompletedHabits, maxStreak, daysInMonth };
 }
+
+

@@ -1162,29 +1162,46 @@ button:disabled {
 
 /* Статусы дней — делаем аккуратнее */
 .calendar-day.status-all-done {
-    background: linear-gradient(135deg, var(--accent-green-bright), var(--accent-lime));
-    color: #0b1a13;
+    background: var(--accent-green);   /* #1f6f4a */
+    color: #ffffff;
     border: none;
+    font-weight: 600;
 }
 
 .calendar-day.status-partial {
     border: 2px solid var(--accent-green-bright);
-    background: rgba(45, 148, 98, 0.2);
+    background: transparent;
+    color: var(--text-primary);
 }
 
 .calendar-day.status-none-done {
-    background: rgba(120, 120, 120, 0.25);
+    background: rgba(120, 120, 120, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .calendar-day.status-no-habits {
-    background: rgba(255, 255, 255, 0.03);
-    opacity: 0.7;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255,255,255,0.08);
+    opacity: 0.6;
 }
 
 .calendar-day.today {
-    border: 2px solid var(--accent-lime);
+    border: 2px solid #ffffff !important;
+    background: transparent !important;
     font-weight: bold;
-    box-shadow: 0 0 0 1px rgba(217, 248, 114, 0.3);
+    box-shadow: none;
+}
+
+.calendar-day.today.status-all-done {
+    background: var(--accent-green) !important;  /* тёмно-зелёный */
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+.calendar-day.today.status-partial {
+    border: 2px solid #ffffff !important;
+    background: transparent !important;
+    /* Можно оставить зелёную рамку? Но вы хотели белую. Оставим белую. */
 }
 
 .day-details-container {
@@ -1404,8 +1421,9 @@ button:disabled {
 
 .logs-layout {
     display: flex;
-    gap: 24px;
+    gap: 16px;
     align-items: stretch;
+    justify-content: flex-start;
 }
 
 .logs-calendar {
@@ -1441,9 +1459,9 @@ button:disabled {
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);   /* более прозрачный, как раньше */
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-md);         /* 16px, а не 28px */
     padding: 16px;
     text-align: center;
     backdrop-filter: blur(8px);
@@ -1477,9 +1495,10 @@ button:disabled {
 .chart-card {
     grid-column: span 2;
     text-align: left;
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.05);   /* одинаково прозрачный */
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(22px) saturate(130%);
+    border-radius: var(--radius-md);         /* 16px */
+    backdrop-filter: blur(8px);
     min-height: auto;
     padding: 16px;
 }
@@ -1536,4 +1555,10 @@ button:disabled {
     .chart-card {
         grid-column: span 1;
     }
+}
+
+.stat-sub {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 6px;
 }
