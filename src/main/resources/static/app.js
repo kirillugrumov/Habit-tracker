@@ -19,6 +19,12 @@ const state = {
         type: null,
         mode: "create",
         id: null
+    },
+    calendar: {
+        view: 'calendar',   // 'calendar' или 'day'
+        selectedDate: null, // формат YYYY-MM-DD
+        currentYear: null,
+        currentMonth: null  // 0-11
     }
 };
 
@@ -72,6 +78,12 @@ function toggleTab(tabId) {
     state.currentTab = tabId;
     clearStatus();
     renderApp();
+}
+
+function initCalendar() {
+    const now = new Date();
+    state.calendar.currentYear = now.getFullYear();
+    state.calendar.currentMonth = now.getMonth();
 }
 
 async function apiRequest(path, options = {}) {
@@ -213,6 +225,7 @@ async function reloadHabitLogs() {
 async function loadAllData() {
     try {
         state.loading = true;
+        initCalendar();
         renderApp();
 
         const [users, habits, categories, goals, logs] = await Promise.all([
@@ -944,22 +957,146 @@ function renderGoalsTab() {
 }
 
 function renderLogsTab() {
+    if (state.calendar.view === 'calendar') {
+        return renderCalendarView();
+    } else {
+        return renderDayDetailsView(state.calendar.selectedDate);
+    }
+}
+
+function getLogsByDate(date) {
+    return state.logs.filter(log => normalizeLogDate(log.logDate) === date);
+}
+
+function isHabitCompletedOnDate(habitId, date) {
+    return state.logs.some(log => log.habitId === habitId && normalizeLogDate(log.logDate) === date);
+}
+
+function getHabitsForDate(date) {
+    return state.habits;
+}
+
+function getDayStats(date) {
+    const habits = getHabitsForDate(date);
+    const logs = getLogsByDate(date);
+    const completedCount = habits.filter(habit => logs.some(log => log.habitId === habit.id)).length;
+    const totalCount = habits.length;
+    return { completedCount, totalCount };
+}
+
+function renderCalendarView() {
+    const year = state.calendar.currentYear;
+    const month = state.calendar.currentMonth;
+    const firstDayOfMonth = new Date(year, month, 1);
+    const startWeekday = firstDayOfMonth.getDay(); // 0 = воскресенье
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const todayStr = getLocalTodayIso();
+
+    // Заголовок с навигацией
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    let calendarHtml = `
+        <section class="calendar-container glass-panel">
+            <div class="calendar-header">
+                <button class="icon-button" data-calendar-prev>&lt;</button>
+                <h3>${monthNames[month]} ${year}</h3>
+                <button class="icon-button" data-calendar-next>&gt;</button>
+                <button class="ghost-button" data-calendar-today>Today</button>
+            </div>
+            <div class="calendar-weekdays">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="calendar-days">
+    `;
+
+    // Пустые ячейки перед первым днём
+    for (let i = 0; i < startWeekday; i++) {
+        calendarHtml += `<div class="calendar-day empty"></div>`;
+    }
+
+    // Дни месяца
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const stats = getDayStats(dateStr);
+        const isToday = (dateStr === todayStr);
+        let statusClass = '';
+        if (stats.totalCount === 0) {
+            statusClass = 'status-no-habits';
+        } else if (stats.completedCount === stats.totalCount && stats.totalCount > 0) {
+            statusClass = 'status-all-done';
+        } else if (stats.completedCount === 0) {
+            statusClass = 'status-none-done';
+        } else {
+            statusClass = 'status-partial';
+        }
+        const title = `${stats.completedCount} / ${stats.totalCount} completed`;
+        calendarHtml += `
+            <div class="calendar-day ${statusClass} ${isToday ? 'today' : ''}" 
+                 data-calendar-date="${dateStr}" 
+                 title="${title}">
+                ${d}
+            </div>
+        `;
+    }
+
+    calendarHtml += `</div></section>`;
+    return calendarHtml;
+}
+
+function renderDayDetailsView(date) {
+    const habits = getHabitsForDate(date);
+    const logs = getLogsByDate(date);
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const todayStr = getLocalTodayIso();
+    const isToday = (date === todayStr);
+
+    const logMap = new Map();
+    logs.forEach(log => logMap.set(log.habitId, log));
+
+    let habitsHtml = '';
+    for (const habit of habits) {
+        const completed = logMap.has(habit.id);
+        const logId = completed ? logMap.get(habit.id).id : null;
+        habitsHtml += `
+            <article class="day-habit-card ${completed ? 'completed' : ''}">
+                <div class="day-habit-info">
+                    <strong>${escapeHtml(habit.name)}</strong>
+                    <div class="chip-row">
+                        ${(habit.categories || []).map(c => `<span class="chip">${escapeHtml(c.name)}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="day-habit-actions">
+                    ${isToday ? (
+            !completed ?
+                `<button class="btn-gradient" data-complete-day-habit="${habit.id}">Complete</button>`
+                : `<button class="btn-outline-light" data-undo-day-habit="${logId}">Undo</button>`
+        ) : (
+            `<span class="chip ${completed ? 'chip--done-state' : 'chip--muted'}">${completed ? 'Completed' : 'Not completed'}</span>`
+        )}
+                </div>
+            </article>
+        `;
+    }
+
+    if (habits.length === 0) {
+        habitsHtml = `<div class="empty-state">No habits exist yet. Create some in the Habits tab.</div>`;
+    }
+
     return `
-        <section class="entity-grid">
-            ${state.logs.map((log) => {
-                const habit = state.habits.find((item) => item.id === log.habitId);
-                return `
-                    <article class="entity-card">
-                        <div class="entity-card-body">
-                            <h3>${escapeHtml(habit?.name || `Habit #${log.habitId}`)}</h3>
-                            <p>${escapeHtml(log.logDate)}</p>
-                        </div>
-                        <div class="entity-card-actions">
-                            <button type="button" class="entity-btn entity-btn--danger" data-delete="logs" data-id="${log.id}">Delete</button>
-                        </div>
-                    </article>
-                `;
-            }).join("") || `<section class="panel"><div class="empty-state">No activity yet.</div></section>`}
+        <section class="day-details-container glass-panel">
+            <div class="day-details-header">
+                <button class="icon-button" data-back-to-calendar>&larr; Back to calendar</button>
+                <h3>${formattedDate}</h3>
+            </div>
+            <div class="day-habits-list">
+                ${habitsHtml}
+            </div>
         </section>
     `;
 }
@@ -1147,4 +1284,114 @@ function bindAppEvents() {
             }
         });
     });
+
+    // Обработчики календаря
+    document.querySelectorAll('[data-calendar-prev]').forEach(btn => {
+        btn.addEventListener('click', () => changeCalendarMonth(-1));
+    });
+    document.querySelectorAll('[data-calendar-next]').forEach(btn => {
+        btn.addEventListener('click', () => changeCalendarMonth(1));
+    });
+    document.querySelectorAll('[data-calendar-today]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const todayStr = getLocalTodayIso();
+            state.calendar.view = 'day';
+            state.calendar.selectedDate = todayStr;
+            renderApp();
+        });
+    });
+
+// Клик по дню календаря (делегирование, т.к. дни создаются динамически)
+    document.querySelector('.calendar-days')?.addEventListener('click', (e) => {
+        const dayDiv = e.target.closest('.calendar-day');
+        if (dayDiv && dayDiv.dataset.calendarDate) {
+            const date = dayDiv.dataset.calendarDate;
+            state.calendar.view = 'day';
+            state.calendar.selectedDate = date;
+            renderApp();
+        }
+    });
+
+// Кнопка "Back to calendar"
+    document.querySelectorAll('[data-back-to-calendar]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.calendar.view = 'calendar';
+            state.calendar.selectedDate = null;
+            renderApp();
+        });
+    });
+
+    const dayContainer = document.querySelector('.day-details-container');
+    if (dayContainer) {
+        dayContainer.addEventListener('click', async (e) => {
+            const completeBtn = e.target.closest('[data-complete-day-habit]');
+            const undoBtn = e.target.closest('[data-undo-day-habit]');
+            if (completeBtn) {
+                const habitId = Number(completeBtn.dataset.completeDayHabit);
+                if (Number.isFinite(habitId)) {
+                    await markHabitCompleteTodayFromCalendar(habitId);
+                }
+            } else if (undoBtn) {
+                const logId = Number(undoBtn.dataset.undoDayHabit);
+                if (Number.isFinite(logId)) {
+                    await undoHabitCompletionTodayFromCalendar(logId);
+                }
+            }
+        });
+    }
+}
+
+async function markHabitCompleteTodayFromCalendar(habitId) {
+    if (state.todayBusy) return;
+    state.todayBusy = true;
+    clearStatus();
+    renderApp();
+    try {
+        await apiRequest("/api/habit-logs", {
+            method: "POST",
+            body: JSON.stringify({ habitId })
+        });
+        await reloadHabitLogs();
+        setStatus("success", "Marked complete for today.");
+        // перерисовываем текущий вид (календарь или детальный день)
+        renderApp();
+    } catch (error) {
+        setStatus("error", error.message);
+    } finally {
+        state.todayBusy = false;
+        renderApp();
+    }
+}
+
+async function undoHabitCompletionTodayFromCalendar(logId) {
+    if (state.todayBusy) return;
+    state.todayBusy = true;
+    clearStatus();
+    renderApp();
+    try {
+        await apiRequest(`/api/habit-logs/${logId}`, { method: "DELETE" });
+        await reloadHabitLogs();
+        setStatus("success", "Completion cleared.");
+        renderApp();
+    } catch (error) {
+        setStatus("error", error.message);
+    } finally {
+        state.todayBusy = false;
+        renderApp();
+    }
+}
+
+function changeCalendarMonth(delta) {
+    let newMonth = state.calendar.currentMonth + delta;
+    let newYear = state.calendar.currentYear;
+    if (newMonth < 0) {
+        newMonth = 11;
+        newYear--;
+    } else if (newMonth > 11) {
+        newMonth = 0;
+        newYear++;
+    }
+    state.calendar.currentYear = newYear;
+    state.calendar.currentMonth = newMonth;
+    renderApp();
 }

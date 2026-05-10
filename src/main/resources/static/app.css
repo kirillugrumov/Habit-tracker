@@ -974,3 +974,97 @@ button:disabled {
 
     padding: 34px 36px 48px;
 }
+
+/* Календарь — компактный, центрированный */
+.calendar-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.calendar-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(36px, 48px));
+    justify-content: center;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    gap: 4px;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(36px, 48px));
+    justify-content: center;
+    gap: 6px;
+}
+
+.calendar-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid var(--glass-border);
+    font-size: 14px;
+}
+
+/* Убираем дефолтный фон у пустых ячеек */
+.calendar-day.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+/* Статусы дней — делаем аккуратнее */
+.calendar-day.status-all-done {
+    background: linear-gradient(135deg, var(--accent-green-bright), var(--accent-lime));
+    color: #0b1a13;
+    border: none;
+}
+
+.calendar-day.status-partial {
+    border: 2px solid var(--accent-green-bright);
+    background: rgba(45, 148, 98, 0.2);
+}
+
+.calendar-day.status-none-done {
+    background: rgba(120, 120, 120, 0.25);
+}
+
+.calendar-day.status-no-habits {
+    background: rgba(255, 255, 255, 0.03);
+    opacity: 0.7;
+}
+
+.calendar-day.today {
+    border: 2px solid var(--accent-lime);
+    font-weight: bold;
+    box-shadow: 0 0 0 1px rgba(217, 248, 114, 0.3);
+}
+
+/* Детальный вид дня — тоже ограничим ширину */
+.day-details-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 24px;
+}
