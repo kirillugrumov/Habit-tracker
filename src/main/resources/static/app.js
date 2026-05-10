@@ -304,14 +304,15 @@ function findEntity(type, id) {
 }
 
 function getModalTitle() {
-    const labels = {
-        user: "Пользователь",
-        habit: "Привычка",
-        category: "Категория",
-        goal: "Цель",
-        log: "Активность"
+    const accLabels = {
+        user: "пользователя",
+        habit: "привычку",
+        category: "категорию",
+        goal: "цель",
+        log: "активность"
     };
-    return `${state.modal.mode === "edit" ? "Редактировать" : "Создать"} ${labels[state.modal.type] || ""}`;
+    const action = state.modal.mode === "edit" ? "Редактировать" : "Создать";
+    return `${action} ${accLabels[state.modal.type] || ""}`;
 }
 
 async function handleUserSubmit(event) {
