@@ -616,10 +616,6 @@ async function confirmDelete(entityType, id) {
         logs: `/api/habit-logs/${id}`
     };
 
-    if (!window.confirm("Удалить этот элемент?")) {
-        return;
-    }
-
     try {
         await apiRequest(endpoints[entityType], { method: "DELETE" });
         setStatus("success", "Элемент удалён.");
