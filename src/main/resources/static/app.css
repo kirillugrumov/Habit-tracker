@@ -1364,3 +1364,158 @@ button:disabled {
         margin-left: 0px;
     }
 }
+
+/* График за последние 7 дней */
+.chart-container {
+    margin-top: 16px;
+}
+
+.chart-title {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    text-align: center;
+}
+
+.chart-bar {
+    background: linear-gradient(135deg, var(--accent-green-bright), var(--accent-lime));
+    border-radius: 4px 4px 0 0;
+    width: 100%;
+    min-height: 2px;
+    transition: height 0.2s ease;
+}
+
+.chart-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+.logs-layout {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+}
+.logs-calendar {
+    flex: 1;
+    max-width: 560px;
+}
+.logs-sidebar {
+    width: 560px;
+    flex-shrink: 0;
+}
+@media (max-width: 860px) {
+    .logs-layout {
+        flex-direction: column;
+    }
+    .logs-sidebar {
+        width: 100%;
+    }
+}
+
+/* Виджет статистики — сетка из карточек */
+.logs-sidebar {
+    width: 560px;         /* теперь виджет такой же ширины, как календарь */
+    flex-shrink: 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-lime);
+    line-height: 1;
+}
+
+/* Карточка графика — занимает обе колонки */
+.chart-card {
+    grid-column: span 2;
+    text-align: left;
+}
+
+.chart-container {
+    margin-top: 8px;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.chart-bar-wrapper {
+    flex: 1;
+    text-align: center;
+}
+
+.chart-bar {
+    background: var(--accent-green-bright);  /* однотонный, без градиента */
+    border-radius: 2px 2px 0 0;
+    width: 100%;
+    min-height: 2px;
+    transition: height 0.2s ease;
+}
+
+.chart-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+/* Адаптив для мобилок */
+@media (max-width: 860px) {
+    .logs-sidebar {
+        width: 100%;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .chart-card {
+        grid-column: span 1;
+    }
+}

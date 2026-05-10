@@ -976,7 +976,12 @@ function renderGoalsTab() {
 
 function renderLogsTab() {
     if (state.calendar.view === 'calendar') {
-        return renderCalendarView();
+        return `
+            <div class="logs-layout">
+                <div class="logs-calendar">${renderCalendarView()}</div>
+                <aside class="logs-sidebar">${renderStatsWidget()}</aside>
+            </div>
+        `;
     } else {
         return renderDayDetailsView(state.calendar.selectedDate);
     }
@@ -1441,4 +1446,122 @@ function changeCalendarMonth(delta) {
     state.calendar.currentYear = newYear;
     state.calendar.currentMonth = newMonth;
     renderApp();
+}
+
+// Возвращает длину текущей серии полностью выполненных дней (начиная с сегодня назад)
+function getCurrentStreak() {
+    let streak = 0;
+    const today = getLocalTodayIso();
+    let checkDate = new Date(today);
+    while (true) {
+        const dateStr = checkDate.toISOString().slice(0,10);
+        const stats = getDayStats(dateStr);
+        if (stats.totalCount === 0) {
+            // дней без привычек не считаем ни туда, ни сюда – прерываем серию
+            break;
+        }
+        if (stats.completedCount === stats.totalCount) {
+            streak++;
+            // отступаем на один день назад
+            checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+            break;
+        }
+    }
+    return streak;
+}
+
+// Получить данные за последние 7 дней (включая сегодня) – массив объектов { date, completed, total, percent }
+function getLast7DaysData() {
+    const result = [];
+    const today = new Date(getLocalTodayIso());
+    for (let i = 6; i >= 0; i--) { // от 6 дней назад до сегодня
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateStr = date.toISOString().slice(0,10);
+        const stats = getDayStats(dateStr);
+        result.push({
+            date: dateStr,
+            completed: stats.completedCount,
+            total: stats.totalCount,
+            percent: stats.totalCount === 0 ? 0 : (stats.completedCount / stats.totalCount) * 100
+        });
+    }
+    return result;
+}
+
+function renderStatsWidget() {
+    const stats = getCurrentMonthStats();
+    const currentStreak = getCurrentStreak();
+    const last7 = getLast7DaysData();
+    const maxBarHeight = 32; // высота столбца в пикселях (уменьшили для минимализма)
+
+    let barsHtml = '';
+    for (let i = 0; i < last7.length; i++) {
+        const day = last7[i];
+        const percent = day.percent;
+        const barHeight = Math.max(2, (percent / 100) * maxBarHeight);
+        barsHtml += `
+            <div class="chart-bar-wrapper" title="${day.date}: ${day.completed}/${day.total} completed">
+                <div class="chart-bar" style="height: ${barHeight}px;"></div>
+                <div class="chart-label">${day.date.slice(5)}</div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Current streak</div>
+                <div class="stat-value">${currentStreak}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Best streak (month)</div>
+                <div class="stat-value">${stats.maxStreak}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total completions</div>
+                <div class="stat-value">${stats.totalCompletedHabits}</div>
+            </div>
+            <div class="stat-card chart-card">
+                <div class="stat-label">Last 7 days</div>
+                <div class="chart-container">
+                    <div class="chart-bars">${barsHtml}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getCurrentMonthStats() {
+    const year = state.calendar.currentYear;
+    const month = state.calendar.currentMonth;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let fullDaysCount = 0;
+    let totalCompletedHabits = 0;
+    let maxStreak = 0;
+    let currentStreak = 0;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const stats = getDayStats(dateStr);
+        if (stats.totalCount === 0) {
+            if (currentStreak > maxStreak) maxStreak = currentStreak;
+            currentStreak = 0;
+            continue;
+        }
+        totalCompletedHabits += stats.completedCount;
+        if (stats.completedCount === stats.totalCount) {
+            fullDaysCount++;
+            currentStreak++;
+            if (currentStreak > maxStreak) maxStreak = currentStreak;
+        } else {
+            if (currentStreak > maxStreak) maxStreak = currentStreak;
+            currentStreak = 0;
+        }
+    }
+    if (currentStreak > maxStreak) maxStreak = currentStreak;
+
+    return { fullDaysCount, totalCompletedHabits, maxStreak, daysInMonth };
 }
