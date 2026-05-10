@@ -392,7 +392,7 @@ async function handleHabitSubmit(event) {
         name: nameVal,
         description: form.description.value.trim(),
         userId: uid,
-        categoryIds: getSelectedValues(form.categoryIds)
+        categoryIds: getCheckedValues(form, "categoryIds")
     };
 
     try {
@@ -1162,13 +1162,26 @@ function renderModalForm(entity) {
                         </select>
                     </label>
                     <label class="modal-field">Description<textarea name="description">${escapeHtml(entity?.description || "")}</textarea></label>
-                    <label class="modal-field">Categories
-                        <select class="modal-select modal-select--multi" name="categoryIds" multiple size="${Math.min(6, Math.max(3, state.categories.length || 3))}">
-                            ${state.categories.map((category) => `
-                                <option value="${category.id}" ${(entity?.categories || []).some((item) => item.id === category.id) ? "selected" : ""}>${escapeHtml(category.name)}</option>
-                            `).join("")}
-                        </select>
-                    </label>
+<label class="modal-field">
+    Categories
+
+    <div class="checkbox-group">
+        ${state.categories.map((category) => `
+            <label class="checkbox-item">
+                <input
+                    type="checkbox"
+                    name="categoryIds"
+                    value="${category.id}"
+                    ${(entity?.categories || []).some((item) => item.id === category.id)
+                ? "checked"
+                : ""}
+                >
+
+                <span>${escapeHtml(category.name)}</span>
+            </label>
+        `).join("")}
+    </div>
+</label>
                     <div class="modal-actions">
                         <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Save" : "Create"}</button>
                         <button class="ghost-button" type="button" data-close-modal="true">Cancel</button>
@@ -1221,6 +1234,12 @@ function renderModalForm(entity) {
         default:
             return "";
     }
+}
+
+function getCheckedValues(form, name) {
+    return Array.from(
+        form.querySelectorAll(`input[name="${name}"]:checked`)
+    ).map((input) => Number(input.value));
 }
 
 function bindAppEvents() {
