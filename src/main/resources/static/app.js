@@ -30,12 +30,12 @@ const state = {
 };
 
 const tabs = [
-    { id: "today", label: "Today" },
-    { id: "habits", label: "Habits" },
-    { id: "users", label: "Users" },
-    { id: "categories", label: "Categories" },
-    { id: "goals", label: "Goals" },
-    { id: "logs", label: "Activity" }
+    { id: "today", label: "Сегодня" },
+    { id: "habits", label: "Привычки" },
+    { id: "users", label: "Пользователи" },
+    { id: "categories", label: "Категории" },
+    { id: "goals", label: "Цели" },
+    { id: "logs", label: "Активность" }
 ];
 
 const app = document.getElementById("app");
@@ -173,7 +173,7 @@ function isValidEmail(value) {
 
 function extractErrorMessage(payload, status) {
     if (!payload) {
-        return `Request failed with status ${status}.`;
+        return `Ошибка запроса, статус ${status}.`;
     }
     if (typeof payload === "string") {
         return payload;
@@ -187,7 +187,7 @@ function extractErrorMessage(payload, status) {
     if (Array.isArray(payload.details) && payload.details.length > 0) {
         return payload.details.map((item) => item.message || JSON.stringify(item)).join("; ");
     }
-    return `Request failed with status ${status}.`;
+    return `Ошибка запроса, статус ${status}.`;
 }
 
 function getLocalTodayIso() {
@@ -305,13 +305,13 @@ function findEntity(type, id) {
 
 function getModalTitle() {
     const labels = {
-        user: "User",
-        habit: "Habit",
-        category: "Category",
-        goal: "Goal",
-        log: "Activity"
+        user: "Пользователь",
+        habit: "Привычка",
+        category: "Категория",
+        goal: "Цель",
+        log: "Активность"
     };
-    return `${state.modal.mode === "edit" ? "Edit" : "Create"} ${labels[state.modal.type] || ""}`;
+    return `${state.modal.mode === "edit" ? "Редактировать" : "Создать"} ${labels[state.modal.type] || ""}`;
 }
 
 async function handleUserSubmit(event) {
@@ -325,14 +325,14 @@ async function handleUserSubmit(event) {
     const u = usernameEl.value.trim();
     const e = emailEl.value.trim();
     if (!u) {
-        showFieldError(usernameEl, "Enter a username.");
+        showFieldError(usernameEl, "Введите имя пользователя.");
         valid = false;
     }
     if (!e) {
-        showFieldError(emailEl, "Enter an email.");
+        showFieldError(emailEl, "Введите email.");
         valid = false;
     } else if (!isValidEmail(e)) {
-        showFieldError(emailEl, "Enter a valid email address.");
+        showFieldError(emailEl, "Введите корректный email.");
         valid = false;
     }
     if (!valid) {
@@ -347,13 +347,13 @@ async function handleUserSubmit(event) {
                 method: "PUT",
                 body: JSON.stringify(payload)
             });
-            setStatus("success", "User updated.");
+            setStatus("success", "Пользователь обновлён.");
         } else {
             await apiRequest("/api/users", {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
-            setStatus("success", "User created.");
+            setStatus("success", "Пользователь создан.");
         }
         closeModal();
         await loadAllData();
@@ -372,16 +372,16 @@ async function handleHabitSubmit(event) {
     const nameVal = nameEl.value.trim();
     let valid = true;
     if (!nameVal) {
-        showFieldError(nameEl, "Enter a habit name.");
+        showFieldError(nameEl, "Введите название привычки.");
         valid = false;
     }
     const uidRaw = userEl.value;
     const uid = Number(uidRaw);
     if (!userEl.disabled && (!uidRaw || !Number.isFinite(uid))) {
-        showFieldError(userEl, "Choose an owner.");
+        showFieldError(userEl, "Выберите владельца.");
         valid = false;
     } else if (userEl.disabled && (!uidRaw || !Number.isFinite(uid))) {
-        showFieldError(userEl, "Owner is unavailable for this habit.");
+        showFieldError(userEl, "Владелец недоступен для этой привычки.");
         valid = false;
     }
     if (!valid) {
@@ -392,7 +392,7 @@ async function handleHabitSubmit(event) {
         name: nameVal,
         description: form.description.value.trim(),
         userId: uid,
-        categoryIds: getCheckedValues(form, "categoryIds")
+        categoryIds: getSelectedValues(form.categoryIds)
     };
 
     try {
@@ -405,13 +405,13 @@ async function handleHabitSubmit(event) {
                     categoryIds: payload.categoryIds
                 })
             });
-            setStatus("success", "Habit updated.");
+            setStatus("success", "Привычка обновлена.");
         } else {
             await apiRequest("/api/habits", {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
-            setStatus("success", "Habit created.");
+            setStatus("success", "Привычка создана.");
         }
         closeModal();
         await loadAllData();
@@ -427,7 +427,7 @@ async function handleCategorySubmit(event) {
     const nameEl = form.name;
     const n = nameEl.value.trim();
     if (!n) {
-        showFieldError(nameEl, "Enter a category name.");
+        showFieldError(nameEl, "Введите название категории.");
         return;
     }
     const payload = {
@@ -441,13 +441,13 @@ async function handleCategorySubmit(event) {
                 method: "PUT",
                 body: JSON.stringify(payload)
             });
-            setStatus("success", "Category updated.");
+            setStatus("success", "Категория обновлена.");
         } else {
             await apiRequest("/api/categories", {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
-            setStatus("success", "Category created.");
+            setStatus("success", "Категория создана.");
         }
         closeModal();
         await loadAllData();
@@ -468,17 +468,17 @@ async function handleGoalSubmit(event) {
     let valid = true;
     const n = nameEl.value.trim();
     if (!n) {
-        showFieldError(nameEl, "Enter a goal name.");
+        showFieldError(nameEl, "Введите название цели.");
         valid = false;
     }
     const habitVal = Number(habitEl.value);
     if (!habitEl.value || !Number.isFinite(habitVal)) {
-        showFieldError(habitEl, "Choose a habit.");
+        showFieldError(habitEl, "Выберите привычку.");
         valid = false;
     }
     const c = condEl.value.trim();
     if (!c) {
-        showFieldError(condEl, "Describe the condition.");
+        showFieldError(condEl, "Опишите условие.");
         valid = false;
     }
     if (!valid) {
@@ -497,13 +497,13 @@ async function handleGoalSubmit(event) {
                 method: "PUT",
                 body: JSON.stringify(payload)
             });
-            setStatus("success", "Goal updated.");
+            setStatus("success", "Цель обновлена.");
         } else {
             await apiRequest("/api/goals", {
                 method: "POST",
                 body: JSON.stringify(payload)
             });
-            setStatus("success", "Goal created.");
+            setStatus("success", "Цель создана.");
         }
         closeModal();
         await loadAllData();
@@ -519,7 +519,7 @@ async function handleLogSubmit(event) {
     const habitEl = form.habitId;
     const hid = Number(habitEl.value);
     if (!habitEl.value || !Number.isFinite(hid)) {
-        showFieldError(habitEl, "Choose a habit.");
+        showFieldError(habitEl, "Выберите привычку.");
         return;
     }
     try {
@@ -527,7 +527,7 @@ async function handleLogSubmit(event) {
             method: "POST",
             body: JSON.stringify({ habitId: hid })
         });
-        setStatus("success", "Activity saved.");
+        setStatus("success", "Активность сохранена.");
         closeModal();
         await reloadHabitLogs();
         renderApp();
@@ -549,7 +549,7 @@ async function markHabitCompleteToday(habitId) {
             body: JSON.stringify({ habitId })
         });
         await reloadHabitLogs();
-        setStatus("success", "Marked complete for today.");
+        setStatus("success", "Отмечено выполненным на сегодня.");
     } catch (error) {
         setStatus("error", error.message);
     } finally {
@@ -568,7 +568,7 @@ async function undoHabitCompletionToday(logId) {
     try {
         await apiRequest(`/api/habit-logs/${logId}`, { method: "DELETE" });
         await reloadHabitLogs();
-        setStatus("success", "Today's completion cleared.");
+        setStatus("success", "Отметка о выполнении снята.");
     } catch (error) {
         setStatus("error", error.message);
     } finally {
@@ -597,7 +597,7 @@ async function completeAllHabitsToday() {
             })
         });
         await reloadHabitLogs();
-        setStatus("success", `Marked ${incomplete.length} habit(s) complete for today.`);
+        setStatus("success", `Отмечено ${incomplete.length} привычек(и) выполненными на сегодня.`);
     } catch (error) {
         setStatus("error", error.message);
     } finally {
@@ -615,13 +615,13 @@ async function confirmDelete(entityType, id) {
         logs: `/api/habit-logs/${id}`
     };
 
-    if (!window.confirm("Delete this item?")) {
+    if (!window.confirm("Удалить этот элемент?")) {
         return;
     }
 
     try {
         await apiRequest(endpoints[entityType], { method: "DELETE" });
-        setStatus("success", "Item deleted.");
+        setStatus("success", "Элемент удалён.");
         await loadAllData();
     } catch (error) {
         setStatus("error", error.message);
@@ -666,8 +666,8 @@ function renderApp() {
                  ✕
                 </button>
                     <div>
-                        <h1>Habit Tracker</h1>
-                        <p>Glass daily flow — stay on streak.</p>
+                        <h1>Habit-Tracker</h1>
+                        <p>Работай сегодня ради себя завтрашнего.</p>
                     </div>
                 </div>
                 <nav class="sidebar-nav">
@@ -698,7 +698,7 @@ function renderApp() {
         
     <div class="footer-content">
         <p>
-            Habit-Tracker — это учебное Spring Boot приложение,
+            Habit-Tracker - это приложение,
             представляющее собой REST API для отслеживания привычек.
             Финальной целью является создание полноценного backend-сервиса
             с подключением к базе данных, реализующего операции выбора,
@@ -706,7 +706,7 @@ function renderApp() {
         </p>
 
         <div class="footer-meta">
-            <span>Built with Spring Boot</span>
+            <span>Сделано на Spring Boot</span>
             <span>•</span>
             <a href="mailto:kirillxxxoio@gmail.com">
                 kirillxxxoio@gmail.com
@@ -724,12 +724,12 @@ function renderApp() {
 
 function getPageTitle() {
     const titles = {
-        today: "Today",
-        habits: "Habits",
-        users: "Users",
-        categories: "Categories",
-        goals: "Goals",
-        logs: "Activity"
+        today: "Сегодня",
+        habits: "Привычки",
+        users: "Пользователи",
+        categories: "Категории",
+        goals: "Цели",
+        logs: "Активность"
     };
     return titles[state.currentTab];
 }
@@ -742,16 +742,16 @@ function getPageSubtitle() {
             ? state.habits.filter((habit) => getTodayLogForHabit(habit.id, todayIso)).length
             : 0;
         if (!total) {
-            return "Add routines under Habits — your checklist for today appears here.";
+            return "Добавьте привычки в разделе «Привычки» — сегодняшний список появится здесь.";
         }
-        return `${done} / ${total} done today · comparing to your device's date (${todayIso}). Server uses its own timezone.`;
+        return `${done} / ${total} выполнено сегодня · сверка с датой вашего устройства (${todayIso}). Сервер использует свой часовой пояс.`;
     }
     const subtitles = {
-        habits: "Manage routines, assign owners and connect categories.",
-        users: "People who own and track habits.",
-        categories: "Flexible labels for organizing habits.",
-        goals: "Targets linked to specific habits.",
-        logs: "Recorded completions and timeline entries."
+        habits: "Управляйте рутинами, назначайте владельцев и связывайте категории.",
+        users: "Люди, которые ведут привычки.",
+        categories: "Гибкие метки для группировки привычек.",
+        goals: "Цели, привязанные к привычкам.",
+        logs: "Записи о выполнении и статистика."
     };
     return subtitles[state.currentTab];
 }
@@ -764,17 +764,17 @@ function renderPrimaryAction() {
             state.todayBusy || state.habits.length === 0 || incomplete.length === 0;
         return `
             <button class="primary-button" type="button" data-complete-all-today ${bulkDisabled ? "disabled" : ""}>
-                Complete all today
+                Выполнить всё
             </button>
-            <button class="ghost-button ghost-button--glass" type="button" data-tab="habits">Manage habits</button>
+            <button class="ghost-button ghost-button--glass" type="button" data-tab="habits">Управление привычками</button>
         `;
     }
     const actions = {
-        habits: `<button class="primary-button" data-open-create="habit">New habit</button>`,
-        users: `<button class="primary-button" data-open-create="user">New user</button>`,
-        categories: `<button class="primary-button" data-open-create="category">New category</button>`,
-        goals: `<button class="primary-button" data-open-create="goal">New goal</button>`,
-        logs: `<button class="primary-button" data-open-create="log">New activity</button>`
+        habits: `<button class="primary-button" data-open-create="habit">Новая привычка</button>`,
+        users: `<button class="primary-button" data-open-create="user">Новый пользователь</button>`,
+        categories: `<button class="primary-button" data-open-create="category">Новая категория</button>`,
+        goals: `<button class="primary-button" data-open-create="goal">Новая цель</button>`,
+        logs: `<button class="primary-button" data-open-create="log">Новая активность</button>`
     };
     return actions[state.currentTab];
 }
@@ -805,9 +805,9 @@ function renderTodayTab() {
     if (!habits.length) {
         return `
             <section class="today-empty glass-panel">
-                <h3>No habits yet</h3>
-                <p>Create your first habit to see it on today's list.</p>
-                <button class="primary-button" type="button" data-tab="habits">Go to Habits</button>
+                <h3>Пока нет привычек</h3>
+                <p>Создайте первую привычку, чтобы она появилась в списке на сегодня.</p>
+                <button class="primary-button" type="button" data-tab="habits">Перейти к привычкам</button>
             </section>
         `;
     }
@@ -815,17 +815,17 @@ function renderTodayTab() {
     return `
         <section class="today-list" aria-busy="${state.todayBusy}">
             ${habits.map((habit) => {
-                const log = getTodayLogForHabit(habit.id, todayIso);
-                const done = Boolean(log);
-                const busy = state.todayBusy;
-                return `
+        const log = getTodayLogForHabit(habit.id, todayIso);
+        const done = Boolean(log);
+        const busy = state.todayBusy;
+        return `
                     <article class="today-card glass-card ${done ? "today-card--done" : ""}">
                         <div class="today-card-body">
                             <h3>${escapeHtml(habit.name)}</h3>
-                            <p>${escapeHtml(habit.description || "No description")}</p>
+                            <p>${escapeHtml(habit.description || "Нет описания")}</p>
                             <div class="today-card-meta">${escapeHtml(habit.username)}</div>
                             <div class="chip-row">
-                                <span class="chip ${done ? "chip--done-state" : "chip--muted"}">${done ? "Done today" : "Pending"}</span>
+                                <span class="chip ${done ? "chip--done-state" : "chip--muted"}">${done ? "Выполнено сегодня" : "Ожидает"}</span>
                                 ${(habit.categories || []).map((category) => `
                                     <span class="chip">${escapeHtml(category.name)}</span>
                                 `).join("")}
@@ -833,17 +833,17 @@ function renderTodayTab() {
                         </div>
                         <div class="today-card-actions">
                             <button type="button" class="btn-gradient today-action-btn" data-complete-habit="${habit.id}"
-                                ${busy || done ? "disabled" : ""} aria-label="Mark complete">
-                                Complete
+                                ${busy || done ? "disabled" : ""} aria-label="Отметить выполненным">
+                                Выполнить
                             </button>
                             <button type="button" class="btn-outline-light today-action-btn" data-undo-log="${log?.id ?? ""}"
-                                ${busy || !log ? "disabled" : ""} aria-label="Undo completion">
-                                Undo
+                                ${busy || !log ? "disabled" : ""} aria-label="Отменить выполнение">
+                                Отменить
                             </button>
                         </div>
                     </article>
                 `;
-            }).join("")}
+    }).join("")}
         </section>
     `;
 }
@@ -857,26 +857,26 @@ function renderHabitsTab() {
     const total = state.searchResult?.totalElements ?? 0;
     const emptyHint =
         total === 0 && !hasFilters
-            ? "No habits yet. Create one to get started."
-            : "Nothing matches — try broader filters or reset.";
+            ? "Пока нет привычек. Создайте первую."
+            : "Ничего не найдено — попробуйте расширить фильтры или сбросить.";
 
     return `
         <section class="panel habits-search-panel">
             <div class="panel-heading">
-                <h3>Search habits</h3>
+                <h3>Поиск привычек</h3>
             </div>
             <form id="search-form" class="habits-search-form" novalidate>
                 <div class="habits-search-fields">
                     <input name="habitName" value="${escapeHtml(state.filters.habitName)}"
-                        placeholder="Habit name" autocomplete="off">
+                        placeholder="Название привычки" autocomplete="off">
                     <input name="username" value="${escapeHtml(state.filters.username)}"
-                        placeholder="Username" autocomplete="off">
+                        placeholder="Имя пользователя" autocomplete="off">
                     <input name="categoryName" value="${escapeHtml(state.filters.categoryName)}"
-                        placeholder="Category" autocomplete="off">
+                        placeholder="Категория" autocomplete="off">
                 </div>
                 <div class="habits-search-actions">
-                    <button class="primary-button" type="submit">Search</button>
-                    <button class="ghost-button" type="button" data-reset-filter="true">Reset</button>
+                    <button class="primary-button" type="submit">Найти</button>
+                    <button class="ghost-button" type="button" data-reset-filter="true">Сбросить</button>
                 </div>
             </form>
         </section>
@@ -886,24 +886,24 @@ function renderHabitsTab() {
                 <article class="entity-card">
                     <div class="entity-card-body">
                         <h3>${escapeHtml(habit.name)}</h3>
-                        <p>${escapeHtml(habit.description || "No description")}</p>
+                        <p>${escapeHtml(habit.description || "Нет описания")}</p>
                         <div class="meta-line">${escapeHtml(habit.username)}</div>
                         <div class="chip-row">
-                            ${(habit.categories || []).map((category) => `<span class="chip">${escapeHtml(category.name)}</span>`).join("") || `<span class="chip muted">No categories</span>`}
+                            ${(habit.categories || []).map((category) => `<span class="chip">${escapeHtml(category.name)}</span>`).join("") || `<span class="chip muted">Нет категорий</span>`}
                         </div>
                     </div>
                     <div class="entity-card-actions">
-                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="habit" data-id="${habit.id}">Edit</button>
-                        <button type="button" class="entity-btn entity-btn--danger" data-delete="habits" data-id="${habit.id}">Delete</button>
+                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="habit" data-id="${habit.id}">Изменить</button>
+                        <button type="button" class="entity-btn entity-btn--danger" data-delete="habits" data-id="${habit.id}">Удалить</button>
                     </div>
                 </article>
             `).join("") || `<div class="habits-empty empty-state">${escapeHtml(emptyHint)}</div>`}
             </div>
             ${state.searchResult ? `
                 <div class="pager habits-pager">
-                    <button type="button" class="ghost-button" data-page-dir="-1" ${state.searchResult.first ? "disabled" : ""}>Previous</button>
-                    <span>Page ${state.searchResult.number + 1} of ${Math.max(state.searchResult.totalPages || 1, 1)} · ${state.searchResult.totalElements ?? 0} total</span>
-                    <button type="button" class="ghost-button" data-page-dir="1" ${state.searchResult.last ? "disabled" : ""}>Next</button>
+                    <button type="button" class="ghost-button" data-page-dir="-1" ${state.searchResult.first ? "disabled" : ""}>Назад</button>
+                    <span>Страница ${state.searchResult.number + 1} из ${Math.max(state.searchResult.totalPages || 1, 1)} · ${state.searchResult.totalElements ?? 0} всего</span>
+                    <button type="button" class="ghost-button" data-page-dir="1" ${state.searchResult.last ? "disabled" : ""}>Вперёд</button>
                 </div>
             ` : ""}
         </section>
@@ -919,15 +919,15 @@ function renderUsersTab() {
                         <h3>${escapeHtml(user.username)}</h3>
                         <p>${escapeHtml(user.email)}</p>
                         <div class="linked-block">
-                            ${getHabitsByUser(user.id).map((habit) => `<span class="chip">${escapeHtml(habit.name)}</span>`).join("") || `<span class="chip muted">No habits yet</span>`}
+                            ${getHabitsByUser(user.id).map((habit) => `<span class="chip">${escapeHtml(habit.name)}</span>`).join("") || `<span class="chip muted">Нет привычек</span>`}
                         </div>
                     </div>
                     <div class="entity-card-actions">
-                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="user" data-id="${user.id}">Edit</button>
-                        <button type="button" class="entity-btn entity-btn--danger" data-delete="users" data-id="${user.id}">Delete</button>
+                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="user" data-id="${user.id}">Изменить</button>
+                        <button type="button" class="entity-btn entity-btn--danger" data-delete="users" data-id="${user.id}">Удалить</button>
                     </div>
                 </article>
-            `).join("") || `<section class="panel"><div class="empty-state">No users yet.</div></section>`}
+            `).join("") || `<section class="panel"><div class="empty-state">Пока нет пользователей.</div></section>`}
         </section>
     `;
 }
@@ -939,17 +939,17 @@ function renderCategoriesTab() {
                 <article class="entity-card">
                     <div class="entity-card-body">
                         <h3>${escapeHtml(category.name)}</h3>
-                        <p>${escapeHtml(category.description || "No description")}</p>
+                        <p>${escapeHtml(category.description || "Нет описания")}</p>
                         <div class="linked-block">
-                            ${getHabitsByCategory(category.id).map((habit) => `<span class="chip">${escapeHtml(habit.name)}</span>`).join("") || `<span class="chip muted">No linked habits</span>`}
+                            ${getHabitsByCategory(category.id).map((habit) => `<span class="chip">${escapeHtml(habit.name)}</span>`).join("") || `<span class="chip muted">Нет связанных привычек</span>`}
                         </div>
                     </div>
                     <div class="entity-card-actions">
-                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="category" data-id="${category.id}">Edit</button>
-                        <button type="button" class="entity-btn entity-btn--danger" data-delete="categories" data-id="${category.id}">Delete</button>
+                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="category" data-id="${category.id}">Изменить</button>
+                        <button type="button" class="entity-btn entity-btn--danger" data-delete="categories" data-id="${category.id}">Удалить</button>
                     </div>
                 </article>
-            `).join("") || `<section class="panel"><div class="empty-state">No categories yet.</div></section>`}
+            `).join("") || `<section class="panel"><div class="empty-state">Пока нет категорий.</div></section>`}
         </section>
     `;
 }
@@ -965,11 +965,11 @@ function renderGoalsTab() {
                         <div class="meta-line">${escapeHtml(goal.habitName)}</div>
                     </div>
                     <div class="entity-card-actions">
-                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="goal" data-id="${goal.id}">Edit</button>
-                        <button type="button" class="entity-btn entity-btn--danger" data-delete="goals" data-id="${goal.id}">Delete</button>
+                        <button type="button" class="entity-btn entity-btn--secondary" data-open-edit="goal" data-id="${goal.id}">Изменить</button>
+                        <button type="button" class="entity-btn entity-btn--danger" data-delete="goals" data-id="${goal.id}">Удалить</button>
                     </div>
                 </article>
-            `).join("") || `<section class="panel"><div class="empty-state">No goals yet.</div></section>`}
+            `).join("") || `<section class="panel"><div class="empty-state">Пока нет целей.</div></section>`}
         </section>
     `;
 }
@@ -1011,15 +1011,14 @@ function renderCalendarView() {
     const year = state.calendar.currentYear;
     const month = state.calendar.currentMonth;
     const firstDayOfMonth = new Date(year, month, 1);
-    const startWeekday = firstDayOfMonth.getDay(); // 0 = воскресенье
+    const startWeekday = firstDayOfMonth.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const todayStr = getLocalTodayIso();
 
-    // Заголовок с навигацией
     const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
     ];
 
     let calendarHtml = `
@@ -1028,20 +1027,18 @@ function renderCalendarView() {
                 <button class="icon-button" data-calendar-prev>&lt;</button>
                 <h3>${monthNames[month]} ${year}</h3>
                 <button class="icon-button" data-calendar-next>&gt;</button>
-                <button class="ghost-button" data-calendar-today>Today</button>
+                <button class="ghost-button" data-calendar-today>Сегодня</button>
             </div>
             <div class="calendar-weekdays">
-                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                <div>Вс</div><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div>
             </div>
             <div class="calendar-days">
     `;
 
-    // Пустые ячейки перед первым днём
     for (let i = 0; i < startWeekday; i++) {
         calendarHtml += `<div class="calendar-day empty"></div>`;
     }
 
-    // Дни месяца
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         const stats = getDayStats(dateStr);
@@ -1056,7 +1053,7 @@ function renderCalendarView() {
         } else {
             statusClass = 'status-partial';
         }
-        const title = `${stats.completedCount} / ${stats.totalCount} completed`;
+        const title = `${stats.completedCount} / ${stats.totalCount} выполнено`;
         calendarHtml += `
             <div class="calendar-day ${statusClass} ${isToday ? 'today' : ''}" 
                  data-calendar-date="${dateStr}" 
@@ -1074,7 +1071,7 @@ function renderDayDetailsView(date) {
     const habits = getHabitsForDate(date);
     const logs = getLogsByDate(date);
     const dateObj = new Date(date);
-    const formattedDate = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    const formattedDate = dateObj.toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
 
     const todayStr = getLocalTodayIso();
     const isToday = (date === todayStr);
@@ -1097,10 +1094,10 @@ function renderDayDetailsView(date) {
                 <div class="day-habit-actions">
                     ${isToday ? (
             !completed ?
-                `<button class="btn-gradient" data-complete-day-habit="${habit.id}">Complete</button>`
-                : `<button class="btn-outline-light" data-undo-day-habit="${logId}">Undo</button>`
+                `<button class="btn-gradient" data-complete-day-habit="${habit.id}">Выполнить</button>`
+                : `<button class="btn-outline-light" data-undo-day-habit="${logId}">Отменить</button>`
         ) : (
-            `<span class="chip ${completed ? 'chip--done-state' : 'chip--muted'}">${completed ? 'Completed' : 'Not completed'}</span>`
+            `<span class="chip ${completed ? 'chip--done-state' : 'chip--muted'}">${completed ? 'Выполнено' : 'Не выполнено'}</span>`
         )}
                 </div>
             </article>
@@ -1108,13 +1105,13 @@ function renderDayDetailsView(date) {
     }
 
     if (habits.length === 0) {
-        habitsHtml = `<div class="empty-state">No habits exist yet. Create some in the Habits tab.</div>`;
+        habitsHtml = `<div class="empty-state">Пока нет привычек. Создайте их в разделе «Привычки».</div>`;
     }
 
     return `
         <section class="day-details-container glass-panel">
             <div class="day-details-header">
-                <button class="icon-button" data-back-to-calendar>&larr; Back to calendar</button>
+                <button class="icon-button" data-back-to-calendar>&larr; Назад к календарю</button>
                 <h3>${formattedDate}</h3>
             </div>
             <div class="day-habits-list">
@@ -1135,7 +1132,7 @@ function renderModal() {
            <div class="modal-card" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
                 <div class="modal-head">
                     <h3>${getModalTitle()}</h3>
-                    <button class="icon-button" data-close-modal="true">Close</button>
+                    <button class="icon-button" data-close-modal="true">Закрыть</button>
                 </div>
                 ${renderModalForm(entity)}
             </div>
@@ -1148,91 +1145,78 @@ function renderModalForm(entity) {
         case "user":
             return `
                 <form id="user-form" class="modal-form" novalidate>
-                    <label class="modal-field">Username<input name="username" autocomplete="username" value="${escapeHtml(entity?.username || "")}"></label>
-                    <label class="modal-field">Email<input name="email" type="email" autocomplete="email" value="${escapeHtml(entity?.email || "")}"></label>
+                    <label class="modal-field">Имя пользователя<input name="username" autocomplete="username" value="${escapeHtml(entity?.username || "")}"></label>
+                    <label class="modal-field">Эл. почта<input name="email" type="email" autocomplete="email" value="${escapeHtml(entity?.email || "")}"></label>
                     <div class="modal-actions">
-                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Save" : "Create"}</button>
-                        <button class="ghost-button" type="button" data-close-modal="true">Cancel</button>
+                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Сохранить" : "Создать"}</button>
+                        <button class="ghost-button" type="button" data-close-modal="true">Отмена</button>
                     </div>
                 </form>
             `;
         case "habit":
             return `
                 <form id="habit-form" class="modal-form" novalidate>
-                    <label class="modal-field">Name<input name="name" autocomplete="off" value="${escapeHtml(entity?.name || "")}"></label>
-                    <label class="modal-field">Owner
+                    <label class="modal-field">Название<input name="name" autocomplete="off" value="${escapeHtml(entity?.name || "")}"></label>
+                    <label class="modal-field">Владелец
                         <select class="modal-select" name="userId" ${state.modal.mode === "edit" ? "disabled" : ""}>
-                            <option value="">Choose user</option>
+                            <option value="">Выберите пользователя</option>
                             ${state.users.map((user) => `<option value="${user.id}" ${(entity?.userId === user.id) ? "selected" : ""}>${escapeHtml(user.username)}</option>`).join("")}
                         </select>
                     </label>
-                    <label class="modal-field">Description<textarea name="description">${escapeHtml(entity?.description || "")}</textarea></label>
-<label class="modal-field">
-    Categories
-
-    <div class="checkbox-group">
-        ${state.categories.map((category) => `
-            <label class="checkbox-item">
-                <input
-                    type="checkbox"
-                    name="categoryIds"
-                    value="${category.id}"
-                    ${(entity?.categories || []).some((item) => item.id === category.id)
-                ? "checked"
-                : ""}
-                >
-
-                <span>${escapeHtml(category.name)}</span>
-            </label>
-        `).join("")}
-    </div>
-</label>
+                    <label class="modal-field">Описание<textarea name="description">${escapeHtml(entity?.description || "")}</textarea></label>
+                    <label class="modal-field">Категории
+                        <select class="modal-select modal-select--multi" name="categoryIds" multiple size="${Math.min(6, Math.max(3, state.categories.length || 3))}">
+                            ${state.categories.map((category) => `
+                                <option value="${category.id}" ${(entity?.categories || []).some((item) => item.id === category.id) ? "selected" : ""}>${escapeHtml(category.name)}</option>
+                            `).join("")}
+                        </select>
+                    </label>
                     <div class="modal-actions">
-                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Save" : "Create"}</button>
-                        <button class="ghost-button" type="button" data-close-modal="true">Cancel</button>
+                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Сохранить" : "Создать"}</button>
+                        <button class="ghost-button" type="button" data-close-modal="true">Отмена</button>
                     </div>
                 </form>
             `;
         case "category":
             return `
                 <form id="category-form" class="modal-form" novalidate>
-                    <label class="modal-field">Name<input name="name" autocomplete="off" value="${escapeHtml(entity?.name || "")}"></label>
-                    <label class="modal-field">Description<textarea name="description">${escapeHtml(entity?.description || "")}</textarea></label>
+                    <label class="modal-field">Название<input name="name" autocomplete="off" value="${escapeHtml(entity?.name || "")}"></label>
+                    <label class="modal-field">Описание<textarea name="description">${escapeHtml(entity?.description || "")}</textarea></label>
                     <div class="modal-actions">
-                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Save" : "Create"}</button>
-                        <button class="ghost-button" type="button" data-close-modal="true">Cancel</button>
+                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Сохранить" : "Создать"}</button>
+                        <button class="ghost-button" type="button" data-close-modal="true">Отмена</button>
                     </div>
                 </form>
             `;
         case "goal":
             return `
                 <form id="goal-form" class="modal-form" novalidate>
-                    <label class="modal-field">Name<input name="name" autocomplete="off" value="${escapeHtml(entity?.name || "")}"></label>
-                    <label class="modal-field">Habit
+                    <label class="modal-field">Название<input name="name" autocomplete="off" value="${escapeHtml(entity?.name || "")}"></label>
+                    <label class="modal-field">Привычка
                         <select class="modal-select" name="habitId">
-                            <option value="">Choose habit</option>
+                            <option value="">Выберите привычку</option>
                             ${state.habits.map((habit) => `<option value="${habit.id}" ${(entity?.habitId === habit.id) ? "selected" : ""}>${escapeHtml(habit.name)}</option>`).join("")}
                         </select>
                     </label>
-                    <label class="modal-field">Condition<textarea name="condition">${escapeHtml(entity?.condition || "")}</textarea></label>
+                    <label class="modal-field">Условие<textarea name="condition">${escapeHtml(entity?.condition || "")}</textarea></label>
                     <div class="modal-actions">
-                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Save" : "Create"}</button>
-                        <button class="ghost-button" type="button" data-close-modal="true">Cancel</button>
+                        <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Сохранить" : "Создать"}</button>
+                        <button class="ghost-button" type="button" data-close-modal="true">Отмена</button>
                     </div>
                 </form>
             `;
         case "log":
             return `
                 <form id="log-form" class="modal-form" novalidate>
-                    <label class="modal-field">Habit
+                    <label class="modal-field">Привычка
                         <select class="modal-select" name="habitId">
-                            <option value="">Choose habit</option>
+                            <option value="">Выберите привычку</option>
                             ${state.habits.map((habit) => `<option value="${habit.id}">${escapeHtml(habit.name)} (${escapeHtml(habit.username)})</option>`).join("")}
                         </select>
                     </label>
                     <div class="modal-actions">
-                        <button class="primary-button" type="submit">Create</button>
-                        <button class="ghost-button" type="button" data-close-modal="true">Cancel</button>
+                        <button class="primary-button" type="submit">Создать</button>
+                        <button class="ghost-button" type="button" data-close-modal="true">Отмена</button>
                     </div>
                 </form>
             `;
@@ -1364,7 +1348,6 @@ function bindAppEvents() {
         }
     });
 
-// Кнопка "Back to calendar"
     document.querySelectorAll('[data-back-to-calendar]').forEach(btn => {
         btn.addEventListener('click', () => {
             state.calendar.view = 'calendar';
@@ -1404,9 +1387,7 @@ async function markHabitCompleteTodayFromCalendar(habitId) {
             body: JSON.stringify({ habitId })
         });
         await reloadHabitLogs();
-        setStatus("success", "Marked complete for today.");
-        // перерисовываем текущий вид (календарь или детальный день)
-        renderApp();
+        setStatus("success", "Отмечено выполненным на сегодня.");
     } catch (error) {
         setStatus("error", error.message);
     } finally {
@@ -1423,8 +1404,7 @@ async function undoHabitCompletionTodayFromCalendar(logId) {
     try {
         await apiRequest(`/api/habit-logs/${logId}`, { method: "DELETE" });
         await reloadHabitLogs();
-        setStatus("success", "Completion cleared.");
-        renderApp();
+        setStatus("success", "Отметка о выполнении снята.");
     } catch (error) {
         setStatus("error", error.message);
     } finally {
@@ -1448,7 +1428,6 @@ function changeCalendarMonth(delta) {
     renderApp();
 }
 
-// Возвращает длину текущей серии полностью выполненных дней (начиная с сегодня назад)
 function getCurrentStreak() {
     let streak = 0;
     const today = getLocalTodayIso();
@@ -1457,12 +1436,10 @@ function getCurrentStreak() {
         const dateStr = checkDate.toISOString().slice(0,10);
         const stats = getDayStats(dateStr);
         if (stats.totalCount === 0) {
-            // дней без привычек не считаем ни туда, ни сюда – прерываем серию
             break;
         }
         if (stats.completedCount === stats.totalCount) {
             streak++;
-            // отступаем на один день назад
             checkDate.setDate(checkDate.getDate() - 1);
         } else {
             break;
@@ -1496,7 +1473,6 @@ function renderStatsWidget() {
     const last7 = getLast7DaysData();
     const maxBarHeight = 32;
 
-    // Доп. показатель: процент дней с выполнением хотя бы одной привычки
     let daysWithAnyCompletion = 0;
     const year = state.calendar.currentYear;
     const month = state.calendar.currentMonth;
@@ -1516,7 +1492,7 @@ function renderStatsWidget() {
         const percent = day.percent;
         const barHeight = Math.max(2, (percent / 100) * maxBarHeight);
         barsHtml += `
-            <div class="chart-bar-wrapper" title="${day.date}: ${day.completed}/${day.total} completed">
+            <div class="chart-bar-wrapper" title="${day.date}: ${day.completed}/${day.total} выполнено">
                 <div class="chart-bar" style="height: ${barHeight}px;"></div>
                 <div class="chart-label">${day.date.slice(5)}</div>
             </div>
@@ -1526,24 +1502,24 @@ function renderStatsWidget() {
     return `
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-label">Current streak (this month)</div>
+                <div class="stat-label">Текущая серия (в этом месяце)</div>
                 <div class="stat-value">${currentStreak}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Best streak (this month)</div>
+                <div class="stat-label">Лучшая серия (в этом месяце)</div>
                 <div class="stat-value">${stats.maxStreak}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total completions (this month)</div>
+                <div class="stat-label">Всего выполнений (в этом месяце)</div>
                 <div class="stat-value">${stats.totalCompletedHabits}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Productivity score</div>
+                <div class="stat-label">Продуктивность</div>
                 <div class="stat-value">${productivityPercent}%</div>
-                <div class="stat-sub">days with any habit done</div>
+                <div class="stat-sub">дней с выполнением</div>
             </div>
             <div class="stat-card chart-card">
-                <div class="stat-label">Weekly progress (last 7 days)</div>
+                <div class="stat-label">Прогресс за последние 7 дней</div>
                 <div class="chart-container">
                     <div class="chart-bars">${barsHtml}</div>
                 </div>
