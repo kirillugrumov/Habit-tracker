@@ -1404,9 +1404,10 @@ button:disabled {
 
 .logs-layout {
     display: flex;
-    gap: 32px;
-    align-items: flex-start;
+    gap: 24px;
+    align-items: stretch;
 }
+
 .logs-calendar {
     flex: 1;
     max-width: 560px;
@@ -1414,6 +1415,8 @@ button:disabled {
 .logs-sidebar {
     width: 560px;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
 }
 @media (max-width: 860px) {
     .logs-layout {
@@ -1434,14 +1437,20 @@ button:disabled {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+    flex: 1;
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xl);
     padding: 16px;
     text-align: center;
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 110px;
     transition: all 0.2s ease;
 }
 
@@ -1451,7 +1460,7 @@ button:disabled {
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-muted);
@@ -1465,10 +1474,14 @@ button:disabled {
     line-height: 1;
 }
 
-/* Карточка графика — занимает обе колонки */
 .chart-card {
     grid-column: span 2;
     text-align: left;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(22px) saturate(130%);
+    min-height: auto;
+    padding: 16px;
 }
 
 .chart-container {
@@ -1480,6 +1493,7 @@ button:disabled {
     align-items: flex-end;
     gap: 8px;
     justify-content: space-between;
+    margin-top: 8px;
 }
 
 .chart-bar-wrapper {
@@ -1497,12 +1511,16 @@ button:disabled {
 
 .chart-label {
     font-size: 10px;
-    color: var(--text-muted);
+    color: var(--text-primary);
     margin-top: 6px;
+    font-weight: 500;
 }
 
-/* Адаптив для мобилок */
 @media (max-width: 860px) {
+    .logs-layout {
+        flex-direction: column;
+        gap: 24px;
+    }
     .logs-sidebar {
         width: 100%;
     }
