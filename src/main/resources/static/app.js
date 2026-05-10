@@ -392,7 +392,7 @@ async function handleHabitSubmit(event) {
         name: nameVal,
         description: form.description.value.trim(),
         userId: uid,
-        categoryIds: getSelectedValues(form.categoryIds)
+        categoryIds: getCheckedValues(form, "categoryIds")
     };
 
     try {
@@ -692,7 +692,7 @@ function renderApp() {
                 </header>
                
                 ${state.status.message ? `<div class="flash ${state.status.type}">${escapeHtml(state.status.message)}</div>` : ""}
-                ${state.loading ? `<section class="panel"><p>Loading...</p></section>` : renderCurrentTab()}
+                ${state.loading ? `<section class="panel"><p>Загрузка...</p></section>` : renderCurrentTab()}
             </div>
                 <footer class="app-footer">
         
@@ -1164,13 +1164,26 @@ function renderModalForm(entity) {
                         </select>
                     </label>
                     <label class="modal-field">Описание<textarea name="description">${escapeHtml(entity?.description || "")}</textarea></label>
-                    <label class="modal-field">Категории
-                        <select class="modal-select modal-select--multi" name="categoryIds" multiple size="${Math.min(6, Math.max(3, state.categories.length || 3))}">
-                            ${state.categories.map((category) => `
-                                <option value="${category.id}" ${(entity?.categories || []).some((item) => item.id === category.id) ? "selected" : ""}>${escapeHtml(category.name)}</option>
-                            `).join("")}
-                        </select>
-                    </label>
+              <label class="modal-field">
+    Категории
+
+    <div class="checkbox-group">
+        ${state.categories.map((category) => `
+            <label class="checkbox-item">
+                <input
+                    type="checkbox"
+                    name="categoryIds"
+                    value="${category.id}"
+                    ${(entity?.categories || []).some((item) => item.id === category.id)
+                ? "checked"
+                : ""}
+                >
+
+                <span>${escapeHtml(category.name)}</span>
+            </label>
+        `).join("")}
+    </div>
+</label>
                     <div class="modal-actions">
                         <button class="primary-button" type="submit">${state.modal.mode === "edit" ? "Сохранить" : "Создать"}</button>
                         <button class="ghost-button" type="button" data-close-modal="true">Отмена</button>
