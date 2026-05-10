@@ -1263,7 +1263,6 @@ button:disabled {
     margin-left: 16px;
 }
 
-/* Адаптив для мобилок */
 @media (max-width: 860px) {
     .day-details-container {
         max-width: 100%;
@@ -1378,7 +1377,7 @@ button:disabled {
 @media (min-width: 861px) {
     .calendar-container,
     .day-details-container {
-        margin-left: 0px;
+        margin-left: 0;
     }
 }
 

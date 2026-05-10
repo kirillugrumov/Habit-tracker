@@ -21,10 +21,10 @@ const state = {
         id: null
     },
     calendar: {
-        view: 'calendar',   // 'calendar' или 'day'
-        selectedDate: null, // формат YYYY-MM-DD
+        view: 'calendar',
+        selectedDate: null,
         currentYear: null,
-        currentMonth: null  // 0-11
+        currentMonth: null
     },
     mobileMenuOpen: false
 };
