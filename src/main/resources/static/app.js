@@ -3,6 +3,7 @@ const state = {
     loading: false,
     todayBusy: false,
     status: { type: "", message: "" },
+    statusTimer: null,
     users: [],
     habits: [],
     categories: [],
@@ -67,8 +68,19 @@ function escapeHtml(value) {
 }
 
 function setStatus(type, message) {
+    if (state.statusTimer) {
+        clearTimeout(state.statusTimer);
+        state.statusTimer = null;
+    }
+
     state.status = { type, message };
     renderApp();
+
+    state.statusTimer = setTimeout(() => {
+        state.status = { type: "", message: "" };
+        state.statusTimer = null;
+        renderApp();
+    }, 3000);
 }
 
 function clearStatus() {
@@ -688,15 +700,18 @@ function renderApp() {
                     </div>
                 </header>
                
-                ${state.status.message ? `<div class="flash ${state.status.type}">${escapeHtml(state.status.message)}</div>` : ""}
-                ${state.loading ? `<section class="panel"><p>Загрузка...</p></section>` : renderCurrentTab()}
+${state.status.message ? `
+    <div class="flash ${state.status.type}" id="flash-message">
+        ${escapeHtml(state.status.message)}
+        <button class="flash-close" data-close-flash>&times;</button>
+    </div>
+` : ""}                ${state.loading ? `<section class="panel"><p>Загрузка...</p></section>` : renderCurrentTab()}
             </div>
                 <footer class="app-footer">
         
     <div class="footer-content">
         <p>
-            Habit-Tracker - это приложение,
-            представляющее собой REST API для отслеживания привычек.
+            Habit-Tracker - это приложение для отслеживания привычек.
             Финальной целью является создание полноценного backend-сервиса
             с подключением к базе данных, реализующего операции выбора,
             кастомизации привычек и ведения статистики выполнения.
@@ -741,14 +756,14 @@ function getPageSubtitle() {
         if (!total) {
             return "Добавьте привычки в разделе «Привычки» — сегодняшний список появится здесь.";
         }
-        return `${done} / ${total} выполнено сегодня · сверка с датой вашего устройства (${todayIso}). Сервер использует свой часовой пояс.`;
+        return `${done} / ${total} выполнено сегодня · (${todayIso})`;
     }
     const subtitles = {
-        habits: "Управляйте рутинами, назначайте владельцев и связывайте категории.",
-        users: "Люди, которые ведут привычки.",
-        categories: "Гибкие метки для группировки привычек.",
-        goals: "Цели, привязанные к привычкам.",
-        logs: "Записи о выполнении и статистика."
+        habits: "Управляйте привычками, назначайте владельцев и категории",
+        users: "Люди, которые приобретают привычки",
+        categories: "Тематические метки для группировки привычек",
+        goals: "Цели, привязанные к привычкам",
+        logs: "Записи о выполнении и статистика"
     };
     return subtitles[state.currentTab];
 }
@@ -868,8 +883,14 @@ function renderHabitsTab() {
                         placeholder="Название привычки" autocomplete="off">
                     <input name="username" value="${escapeHtml(state.filters.username)}"
                         placeholder="Имя пользователя" autocomplete="off">
-                    <input name="categoryName" value="${escapeHtml(state.filters.categoryName)}"
-                        placeholder="Категория" autocomplete="off">
+                  <select name="categoryName">
+    <option value="">Все категории</option>
+    ${state.categories.map(category => `
+        <option value="${escapeHtml(category.name)}" ${state.filters.categoryName === category.name ? 'selected' : ''}>
+            ${escapeHtml(category.name)}
+        </option>
+    `).join('')}
+</select>
                 </div>
                 <div class="habits-search-actions">
                     <button class="primary-button" type="submit">Найти</button>
@@ -1242,6 +1263,19 @@ function getCheckedValues(form, name) {
 }
 
 function bindAppEvents() {
+
+    const flashClose = document.querySelector('[data-close-flash]');
+    if (flashClose) {
+        flashClose.addEventListener('click', () => {
+            if (state.statusTimer) {
+                clearTimeout(state.statusTimer);
+                state.statusTimer = null;
+            }
+            state.status = { type: "", message: "" };
+            renderApp();
+        });
+    }
+   
     document.querySelector("[data-open-mobile-menu]")?.addEventListener("click", () => {
         openMobileMenu();
     });

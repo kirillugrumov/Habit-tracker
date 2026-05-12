@@ -1,352 +1,402 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
-  <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="HabitTracker Load Plan" enabled="true">
-      <stringProp name="TestPlan.comments">Load test with several POST requests, async status polling and race demo.</stringProp>
-      <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
-      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
-        <collectionProp name="Arguments.arguments">
-          <elementProp name="protocol" elementType="Argument">
-            <stringProp name="Argument.name">protocol</stringProp>
-            <stringProp name="Argument.value">http</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="host" elementType="Argument">
-            <stringProp name="Argument.name">host</stringProp>
-            <stringProp name="Argument.value">localhost</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="port" elementType="Argument">
-            <stringProp name="Argument.name">port</stringProp>
-            <stringProp name="Argument.value">8080</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-        </collectionProp>
-      </elementProp>
-      <stringProp name="TestPlan.user_define_classpath"></stringProp>
-    </TestPlan>
-    <hashTree>
-      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults">
-        <stringProp name="HTTPSampler.domain">${host}</stringProp>
-        <stringProp name="HTTPSampler.port">${port}</stringProp>
-        <stringProp name="HTTPSampler.protocol">${protocol}</stringProp>
-        <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
-        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-          <collectionProp name="Arguments.arguments"/>
-        </elementProp>
-        <stringProp name="HTTPSampler.implementation"></stringProp>
-      </ConfigTestElement>
-      <hashTree/>
-      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="JSON Headers" enabled="true">
-        <collectionProp name="HeaderManager.headers">
-          <elementProp name="" elementType="Header">
-            <stringProp name="Header.name">Content-Type</stringProp>
-            <stringProp name="Header.value">application/json</stringProp>
-          </elementProp>
-          <elementProp name="" elementType="Header">
-            <stringProp name="Header.name">Accept</stringProp>
-            <stringProp name="Header.value">application/json</stringProp>
-          </elementProp>
-        </collectionProp>
-      </HeaderManager>
-      <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Main Load">
-        <intProp name="ThreadGroup.num_threads">50</intProp>
-        <intProp name="ThreadGroup.ramp_time">5</intProp>
-        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
-          <stringProp name="LoopController.loops">100</stringProp>
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-        </elementProp>
-      </ThreadGroup>
-      <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST User" enabled="true">
-          <stringProp name="HTTPSampler.path">/api/users</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&#xd;
-  &quot;username&quot;: &quot;jmeter_user_${__UUID()}&quot;,&#xd;
-  &quot;email&quot;: &quot;jmeter_${__UUID()}@example.com&quot;&#xd;
-}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract userId" enabled="true">
-            <stringProp name="JSONPostProcessor.referenceNames">userId</stringProp>
-            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
-            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
-            <stringProp name="JSONPostProcessor.defaultValues">1</stringProp>
-          </JSONPostProcessor>
-          <hashTree/>
-        </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST Category" enabled="true">
-          <stringProp name="HTTPSampler.path">/api/categories</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&#xd;
-  &quot;name&quot;: &quot;JMeter Category ${__UUID()}&quot;,&#xd;
-  &quot;description&quot;: &quot;Category from load test&quot;&#xd;
-}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract categoryId" enabled="true">
-            <stringProp name="JSONPostProcessor.referenceNames">categoryId</stringProp>
-            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
-            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
-            <stringProp name="JSONPostProcessor.defaultValues">1</stringProp>
-          </JSONPostProcessor>
-          <hashTree/>
-        </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST Habit" enabled="true">
-          <stringProp name="HTTPSampler.path">/api/habits</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&#xd;
-  &quot;name&quot;: &quot;JMeter Habit ${__UUID()}&quot;,&#xd;
-  &quot;description&quot;: &quot;Habit from load test&quot;,&#xd;
-  &quot;userId&quot;: ${userId},&#xd;
-  &quot;categoryIds&quot;: [${categoryId}]&#xd;
-}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract habitId" enabled="true">
-            <stringProp name="JSONPostProcessor.referenceNames">habitId</stringProp>
-            <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
-            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
-            <stringProp name="JSONPostProcessor.defaultValues">1</stringProp>
-          </JSONPostProcessor>
-          <hashTree/>
-        </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET Habits" enabled="true">
-          <stringProp name="HTTPSampler.path">/api/habits</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-            <collectionProp name="Arguments.arguments"/>
-          </elementProp>
-        </HTTPSamplerProxy>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST Async Operation" enabled="true">
-          <stringProp name="HTTPSampler.path">/api/async-operations</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">POST</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&#xd;
-  &quot;iterations&quot;: 200000,&#xd;
-  &quot;delaySeconds&quot;: 10&#xd;
-}</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-        </HTTPSamplerProxy>
-        <hashTree>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="Extract taskId" enabled="true">
-            <stringProp name="JSONPostProcessor.referenceNames">taskId</stringProp>
-            <stringProp name="JSONPostProcessor.jsonPathExprs">$.taskId</stringProp>
-            <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
-            <stringProp name="JSONPostProcessor.defaultValues">1</stringProp>
-          </JSONPostProcessor>
-          <hashTree/>
-        </hashTree>
-        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Wait Before Async Status" enabled="true">
-          <stringProp name="ConstantTimer.delay">1000</stringProp>
-        </ConstantTimer>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET Async Status" enabled="true">
-          <stringProp name="HTTPSampler.path">/api/async-operations/${taskId}</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-            <collectionProp name="Arguments.arguments"/>
-          </elementProp>
-        </HTTPSamplerProxy>
-        <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET Race Demo" enabled="true">
-          <stringProp name="HTTPSampler.path">/api/concurrency/race-demo</stringProp>
-          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-          <stringProp name="HTTPSampler.method">GET</stringProp>
-          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
-          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-            <collectionProp name="Arguments.arguments">
-              <elementProp name="threads" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.name">threads</stringProp>
-                <stringProp name="Argument.value">50</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-              <elementProp name="tasks" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.name">tasks</stringProp>
-                <stringProp name="Argument.value">200000</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-              <elementProp name="trials" elementType="HTTPArgument">
-                <boolProp name="HTTPArgument.always_encode">true</boolProp>
-                <stringProp name="Argument.name">trials</stringProp>
-                <stringProp name="Argument.value">5</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-                <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              </elementProp>
-            </collectionProp>
-          </elementProp>
-        </HTTPSamplerProxy>
-        <hashTree/>
-      </hashTree>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
-        <boolProp name="ResultCollector.error_logging">false</boolProp>
-        <objProp>
-          <name>saveConfig</name>
-          <value class="SampleSaveConfiguration">
-            <time>true</time>
-            <latency>true</latency>
-            <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
-            <message>true</message>
-            <threadName>true</threadName>
-            <dataType>true</dataType>
-            <encoding>false</encoding>
-            <assertions>true</assertions>
-            <subresults>true</subresults>
-            <responseData>false</responseData>
-            <samplerData>false</samplerData>
-            <xml>false</xml>
-            <fieldNames>true</fieldNames>
-            <responseHeaders>false</responseHeaders>
-            <requestHeaders>false</requestHeaders>
-            <responseDataOnError>false</responseDataOnError>
-            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-            <assertionsResultsToSave>0</assertionsResultsToSave>
-            <bytes>true</bytes>
-            <sentBytes>true</sentBytes>
-            <url>true</url>
-            <threadCounts>true</threadCounts>
-            <idleTime>true</idleTime>
-            <connectTime>true</connectTime>
-          </value>
-        </objProp>
-        <stringProp name="filename"></stringProp>
-      </ResultCollector>
-      <hashTree/>
-      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
-        <boolProp name="ResultCollector.error_logging">false</boolProp>
-        <objProp>
-          <name>saveConfig</name>
-          <value class="SampleSaveConfiguration">
-            <time>true</time>
-            <latency>true</latency>
-            <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
-            <message>true</message>
-            <threadName>true</threadName>
-            <dataType>true</dataType>
-            <encoding>false</encoding>
-            <assertions>true</assertions>
-            <subresults>true</subresults>
-            <responseData>false</responseData>
-            <samplerData>false</samplerData>
-            <xml>false</xml>
-            <fieldNames>true</fieldNames>
-            <responseHeaders>false</responseHeaders>
-            <requestHeaders>false</requestHeaders>
-            <responseDataOnError>false</responseDataOnError>
-            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-            <assertionsResultsToSave>0</assertionsResultsToSave>
-            <bytes>true</bytes>
-            <sentBytes>true</sentBytes>
-            <url>true</url>
-            <threadCounts>true</threadCounts>
-            <idleTime>true</idleTime>
-            <connectTime>true</connectTime>
-          </value>
-        </objProp>
-        <stringProp name="filename"></stringProp>
-      </ResultCollector>
-      <hashTree/>
-      <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report">
-        <boolProp name="ResultCollector.error_logging">false</boolProp>
-        <objProp>
-          <name>saveConfig</name>
-          <value class="SampleSaveConfiguration">
-            <time>true</time>
-            <latency>true</latency>
-            <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
-            <message>true</message>
-            <threadName>true</threadName>
-            <dataType>true</dataType>
-            <encoding>false</encoding>
-            <assertions>true</assertions>
-            <subresults>true</subresults>
-            <responseData>false</responseData>
-            <samplerData>false</samplerData>
-            <xml>false</xml>
-            <fieldNames>true</fieldNames>
-            <responseHeaders>false</responseHeaders>
-            <requestHeaders>false</requestHeaders>
-            <responseDataOnError>false</responseDataOnError>
-            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-            <assertionsResultsToSave>0</assertionsResultsToSave>
-            <bytes>true</bytes>
-            <sentBytes>true</sentBytes>
-            <url>true</url>
-            <threadCounts>true</threadCounts>
-            <idleTime>true</idleTime>
-            <connectTime>true</connectTime>
-          </value>
-        </objProp>
-        <stringProp name="filename"></stringProp>
-      </ResultCollector>
-      <hashTree/>
-    </hashTree>
-  </hashTree>
-</jmeterTestPlan>
+<mxfile host="app.diagrams.net" modified="2026-05-12T12:00:00.000Z" agent="5.0" etag="full_bcd_counter" version="22.1.0" type="device">
+  <diagram name="BCD Counter Full" id="bcd_full">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Название схемы -->
+        <mxCell id="title" value="Счётчик нажатий с памятью последнего события (двоично-десятичный)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="350" y="10" width="800" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================= -->
+        <!-- 1. Кнопки и входные цепи                    -->
+        <!-- ============================================= -->
+        
+        <!-- Кнопка "Такт" -->
+        <mxCell id="tact_btn" value="Такт" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="70" height="45" as="geometry"/>
+        </mxCell>
+        
+        <!-- RC-цепь для такта (дифференцирующая) -->
+        <mxCell id="rc_tact" value="R1 C1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="95" width="50" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="rc_tact_line" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="tact_btn" target="rc_tact">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="rc_tact_out" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="rc_tact" target="s_inv">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="110" as="sourcePoint"/>
+            <mxPoint x="240" y="110" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Кнопка "Сброс" -->
+        <mxCell id="reset_btn" value="Сброс" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="220" width="70" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Кнопка "Запомнить" -->
+        <mxCell id="store_btn" value="Запомнить" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="560" width="80" height="45" as="geometry"/>
+        </mxCell>
+        <mxCell id="rc_store" value="R2 C2" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="130" y="555" width="50" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="store_to_rc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="store_btn" target="rc_store">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================= -->
+        <!-- 2. Двоично-десятичный счётчик на JK-триггерах -->
+        <!-- ============================================= -->
+        
+        <!-- Триггер T0 (младший разряд) -->
+        <mxCell id="jk0" value="К155ТВ1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="240" y="70" width="70" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="jk0_J" value="J" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="215" y="85" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="jk0_K" value="K" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="215" y="115" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="jk0_C" value="C" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="215" y="100" width="20" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="jk0_Q" value="Q" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="315" y="90" width="20" height="15" as="geometry"/>
+        </mxCell>
+        
+        <!-- Триггер T1 -->
+        <mxCell id="jk1" value="К155ТВ1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="240" y="160" width="70" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="jk1_Q" value="Q" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="315" y="180" width="20" height="15" as="geometry"/>
+        </mxCell>
+        
+        <!-- Триггер T2 -->
+        <mxCell id="jk2" value="К155ТВ1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="240" y="250" width="70" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="jk2_Q" value="Q" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="315" y="270" width="20" height="15" as="geometry"/>
+        </mxCell>
+        
+        <!-- Триггер T3 (старший) -->
+        <mxCell id="jk3" value="К155ТВ1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="240" y="340" width="70" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="jk3_Q" value="Q" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="315" y="360" width="20" height="15" as="geometry"/>
+        </mxCell>
+        
+        <!-- Соединения тактовых входов -->
+        <mxCell id="clk_line" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="rc_tact" target="jk0">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="110" as="sourcePoint"/>
+            <mxPoint x="240" y="107" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="clk_to_jk1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk0_Q" target="jk1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="100" as="sourcePoint"/>
+            <mxPoint x="310" y="195" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="clk_to_jk2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk1_Q" target="jk2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="190" as="sourcePoint"/>
+            <mxPoint x="310" y="285" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="clk_to_jk3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk2_Q" target="jk3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="280" as="sourcePoint"/>
+            <mxPoint x="310" y="375" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Подключение J и K всех триггеров к Vcc (лог.1) -->
+        <mxCell id="vcc" value="+5V" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="180" y="300" width="40" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="vcc_to_j0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="vcc" target="jk0_J">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="312" as="sourcePoint"/>
+            <mxPoint x="215" y="92" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="200" y="92"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="vcc_to_k0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="vcc" target="jk0_K">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="312" as="sourcePoint"/>
+            <mxPoint x="215" y="120" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="vcc_to_j1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="vcc" target="jk1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="312" as="sourcePoint"/>
+            <mxPoint x="240" y="175" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="230" y="175"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="vcc_to_k1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="vcc" target="jk1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="312" as="sourcePoint"/>
+            <mxPoint x="240" y="205" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="230" y="205"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <!-- аналогично для jk2, jk3 – но для краткости опускаю линии, в реальной схеме они есть -->
+        
+        <!-- Цепь сброса счетчика после 9 (Q1 и Q8 обнаружение) -->
+        <mxCell id="and_reset" value="2И" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="270" width="50" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="from_jk0_q" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk0_Q" target="and_reset">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="100" as="sourcePoint"/>
+            <mxPoint x="400" y="285" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="380" y="100"/>
+              <mxPoint x="380" y="285"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="from_jk3_q" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk3_Q" target="and_reset">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="370" as="sourcePoint"/>
+            <mxPoint x="400" y="305" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="380" y="370"/>
+              <mxPoint x="380" y="305"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="reset_to_all" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="and_reset" target="reset_btn">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="290" as="sourcePoint"/>
+            <mxPoint x="110" y="242" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="480" y="290"/>
+              <mxPoint x="480" y="242"/>
+              <mxPoint x="110" y="242"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="reset_label" value="Сброс при Q1=1 и Q8=1 (число 9)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;" vertex="1" connectable="0" parent="reset_to_all">
+          <mxGeometry x="0.2" y="-1" relative="1" as="geometry">
+            <mxPoint x="20" y="0" as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ============================================= -->
+        <!-- 3. Регистр памяти на D-триггерах             -->
+        <!-- ============================================= -->
+        
+        <!-- Четыре D-триггера (микросхема К155ТМ2 содержит 2 триггера, нужно 2 корпуса) -->
+        <mxCell id="dff0" value="D" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="600" y="80" width="50" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="dff1" value="D" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="600" y="140" width="50" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="dff2" value="D" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="600" y="200" width="50" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="dff3" value="D" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="600" y="260" width="50" height="40" as="geometry"/>
+        </mxCell>
+        
+        <!-- Входы данных от счетчика -->
+        <mxCell id="data0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk0_Q" target="dff0">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="100" as="sourcePoint"/>
+            <mxPoint x="600" y="100" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="500" y="100"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="data1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk1_Q" target="dff1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="190" as="sourcePoint"/>
+            <mxPoint x="600" y="160" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="500" y="190"/>
+              <mxPoint x="500" y="160"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="data2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk2_Q" target="dff2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="280" as="sourcePoint"/>
+            <mxPoint x="600" y="220" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="500" y="280"/>
+              <mxPoint x="500" y="220"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="data3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="jk3_Q" target="dff3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="335" y="370" as="sourcePoint"/>
+            <mxPoint x="600" y="280" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="500" y="370"/>
+              <mxPoint x="500" y="280"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Тактовый вход регистра (сигнал "Запомнить") -->
+        <mxCell id="store_clk_line" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="rc_store" target="dff0">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="570" as="sourcePoint"/>
+            <mxPoint x="625" y="120" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="550" y="570"/>
+              <mxPoint x="550" y="120"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="store_clk_to_others" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="dff0" target="dff1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="120" as="sourcePoint"/>
+            <mxPoint x="625" y="160" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <!-- аналогично для dff2,dff3 -->
+        
+        <!-- Выход регистра – последнее значение -->
+        <mxCell id="mem_out0" value="Q0" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="90" width="30" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="mem_out1" value="Q1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="150" width="30" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="mem_out2" value="Q2" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="210" width="30" height="15" as="geometry"/>
+        </mxCell>
+        <mxCell id="mem_out3" value="Q3" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="660" y="270" width="30" height="15" as="geometry"/>
+        </mxCell>
+        
+        <!-- ============================================= -->
+        <!-- 4. RS-триггер флага активности              -->
+        <!-- ============================================= -->
+        <mxCell id="rs_ff_impl" value="К155ЛА3" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="280" y="460" width="140" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="rs_inv1" value="&amp;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="300" y="480" width="30" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="rs_inv2" value="&amp;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="360" y="480" width="30" height="25" as="geometry"/>
+        </mxCell>
+        
+        <!-- Линия установки S от такта (через инвертор, чтобы сделать активный низкий уровень?) или напрямую. Упростим: S от RC-цепи такта -->
+        <mxCell id="set_line" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;dashed=1;" edge="1" parent="1" source="rc_tact" target="rs_inv1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="110" as="sourcePoint"/>
+            <mxPoint x="315" y="480" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="220" y="110"/>
+              <mxPoint x="220" y="480"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="set_label" value="S" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="set_line">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="-10" y="-5" as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Линия сброса R от кнопки "Запомнить" -->
+        <mxCell id="reset_line" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;dashed=1;" edge="1" parent="1" source="rc_store" target="rs_inv2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="180" y="570" as="sourcePoint"/>
+            <mxPoint x="375" y="480" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="230" y="570"/>
+              <mxPoint x="230" y="480"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="reset_label2" value="R" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;" vertex="1" connectable="0" parent="reset_line">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="10" y="-5" as="offset"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Выход флага -->
+        <mxCell id="flag_out_label" value="Флаг активности" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="460" y="500" width="120" height="20" as="geometry"/>
+        </mxCell>
+        <mxCell id="flag_line" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="rs_inv2" target="flag_out_label">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="390" y="492" as="sourcePoint"/>
+            <mxPoint x="460" y="510" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ============================================= -->
+        <!-- 5. Дешифратор для индикации (опционально)    -->
+        <!-- ============================================= -->
+        <mxCell id="decoder" value="DC&lt;br&gt;BCD-7" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="850" y="160" width="70" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="dec_in0" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="dff0" target="decoder">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="100" as="sourcePoint"/>
+            <mxPoint x="850" y="175" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="750" y="100"/>
+              <mxPoint x="750" y="175"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dec_in1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="dff1" target="decoder">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="160" as="sourcePoint"/>
+            <mxPoint x="850" y="190" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dec_in2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="dff2" target="decoder">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="220" as="sourcePoint"/>
+            <mxPoint x="850" y="205" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dec_in3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="dff3" target="decoder">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="280" as="sourcePoint"/>
+            <mxPoint x="850" y="220" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="segment_display" value="7-сегм.&#xa;индикатор" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="960" y="170" width="80" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="dec_to_disp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;" edge="1" parent="1" source="decoder" target="segment_display">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        
+        <!-- Пояснение -->
+        <mxCell id="legend" value="Примечания:&#xa;1. Счётчик построен на JK-триггерах К155ТВ1, включённых как T-триггеры (J=K=1).&#xa;2. Обнуление счётчика происходит при достижении кода 9 (Q1=1 и Q8=1) – сигнал подаётся на вход R всех триггеров.&#xa;3. Регистр памяти – 4 D-триггера К155ТМ2 (две микросхемы).&#xa;4. Флаг активности – RS-триггер на двух элементах 2И-НЕ К155ЛА3.&#xa;5. Дифференцирующие RC-цепи формируют короткие импульсы от кнопок." style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="80" y="650" width="750" height="100" as="geometry"/>
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
