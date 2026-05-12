@@ -45,3 +45,11 @@ logs/
 hs_err_pid*.log
 *.log
 *.log.gz
+
+# Секреты и переменные окружения
+.env
+.env.local
+.env.*.local
+
+# Временные файлы Docker
+*.pid
