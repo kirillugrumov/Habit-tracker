@@ -43,9 +43,9 @@ jobs:
 
       - name: Health check
         run: |
-          for i in {1..10}; do
-            if curl -f https://habittracker-app.onrender.com/actuator/health; then
-              echo "Health check passed"
+          for i in {1..20}; do
+          if curl -f --max-time 60 https://habittracker-app-ivdt.onrender.com/actuator/health; then         
+          echo "Health check passed"
               exit 0
             fi
             echo "Waiting for app to be ready... (attempt $i)"
