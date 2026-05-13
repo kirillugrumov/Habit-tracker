@@ -35,8 +35,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deploy
-        run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl -X POST "$DEPLOY_HOOK"
 
       - name: Wait for deployment
         run: sleep 30
